@@ -1,34 +1,29 @@
 #|
-This file is a part of TyNETv5/Radiance
-(c) 2013 TymoonNET/NexT http://tymoon.eu (shinmera@tymoon.eu)
-Author: Nicolas Hafner <shinmera@tymoon.eu>
+ This file is a part of TyNETv5/Radiance
+ (c) 2013 TymoonNET/NexT http://tymoon.eu (shinmera@tymoon.eu)
+ Author: Nicolas Hafner <shinmera@tymoon.eu>
 |#
 
-(defpackage radiance-mod-plaster
-  (:use :cl :radiance :lquery :alexandria))
-(in-package :radiance-mod-plaster)
-
+(in-package #:cl-user)
 (asdf:defsystem plaster
-  :class :radiance-module
+  :class "radiance:module"
   :defsystem-depends-on (:radiance)
   :name "Plaster Pasting Service" 
   :author "Nicolas Hafner"
   :version "0.0.1" 
   :license "Artistic" 
-  :homepage "http://tymoon.eu"
-  :implement ()
-  :components ((:file "frontend")
-               (:file "backend")
+  :homepage "http://github.com/Shinmera/radiance-plaster"
+  :components ((:file "module")
+               (:file "frontend")
+               ;;(:file "backend")
                (:file "pastebin-type-map")
                (:file "api"))
-  :depends-on (:radiance-database
-               :radiance-data-model
-               :radiance-user
-               :radiance-session
-               :radiance-admin
-               :radiance-profile
-               :uibox
+  :depends-on ((:interface :database)
+               (:interface :data-model)
+               (:interface :user)
+               (:interface :profile)
+               (:interface :auth)
                :alexandria
-               :radiance-crypto
+               :crypto-shortcuts
                :drakma
                :cl-ppcre))

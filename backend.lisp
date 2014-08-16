@@ -4,7 +4,7 @@
  Author: Nicolas Hafner <shinmera@tymoon.eu>
 |#
 
-(in-package :radiance-mod-plaster)
+(in-package #:plaster)
 
 (admin:define-panel general plaster (:lquery (template "plaster/admin-general.html") :menu-icon "fa-file-text" :menu-tooltip "General plaster settings")
   (cond

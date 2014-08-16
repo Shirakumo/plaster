@@ -1,10 +1,10 @@
 #|
-This file is a part of TyNETv5/Radiance
-(c) 2013 TymoonNET/NexT http://tymoon.eu (shinmera@tymoon.eu)
-Author: Nicolas Hafner <shinmera@tymoon.eu>
+ This file is a part of TyNETv5/Radiance
+ (c) 2013 TymoonNET/NexT http://tymoon.eu (shinmera@tymoon.eu)
+ Author: Nicolas Hafner <shinmera@tymoon.eu>
 |#
 
-(in-package :radiance-mod-plaster)
+(in-package #:plaster)
 
 (define-hook (:server :init) (:documentation "Initializer plaster database table.")
   ;; PID: -1 or _id of annotated parent.

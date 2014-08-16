@@ -4,7 +4,7 @@
  Author: Nicolas Hafner <shinmera@tymoon.eu>
 |#
 
-(in-package :radiance-mod-plaster)
+(in-package #:plaster)
 
 (core:define-api raw (id &optional (password "")) (:method T)
   "Returns the raw paste text in text/plain format."

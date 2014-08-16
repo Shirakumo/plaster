@@ -4,7 +4,7 @@
  Author: Nicolas Hafner <shinmera@tymoon.eu>
 |#
 
-(in-package :radiance-mod-plaster)
+(in-package #:plaster)
 
 (defparameter *pastebin-type-map*
   (loop with table = (make-hash-table :test 'equalp)
