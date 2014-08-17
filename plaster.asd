@@ -23,6 +23,7 @@
                (:interface :user)
                (:interface :profile)
                (:interface :auth)
+               :r-clip
                :alexandria
                :crypto-shortcuts
                :drakma

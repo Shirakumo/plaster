@@ -9,7 +9,7 @@ html{
 }
 
 body{
-    margin: 0 10% 0 10%;
+    margin: 0 0 0 0;
     min-width: 700px;
 }
 
@@ -43,8 +43,7 @@ header nav ul::after{
 
 #content{
     background: #DDD;
-    padding: 20px;
-    /*padding: 20px 0 20px 0;*/
+    padding: 0 0 20px 0;
 }
 
 #content>h2{
