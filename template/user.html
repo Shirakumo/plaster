@@ -36,7 +36,7 @@
               <tbody iterate=":pastes">
                 <tr class="paste">
                   <td class="title"><a href="/view?id=ID" lquery="(text title) (attr :href (plaster::paste-url _id))"></a></td>
-                  <td class="view" ><i class="fa" id="pasteviewicon" lquery="(add-class (format NIL &quot;view-~a&quot; view)) (text view)"></i></td>
+                  <td class="view" ><i class="fa" id="pasteviewicon" lquery="(add-class (format NIL &quot;view-~a&quot; view)) (text (plaster::view->name view))"></i></td>
                   <td class="hits" lquery="(text (princ-to-string hits))"></td>
                   <td class="type" lquery="(text (plaster::type->title type))"></td>
                   <td lquery="(text (plaster::format-time time))" class="label unixtime date"></td>
@@ -51,7 +51,7 @@
               <tbody iterate=":annots">
                 <tr class="paste">
                   <td class="title"><a href="/view/ID#annotation-ID" lquery="(text title) (attr :href (plaster::paste-url pid _id))"></a></td>
-                  <td class="view" ><i class="fa" id="pasteviewicon" lquery="(add-class (format NIL &quot;view-~a&quot; view)) (text view)"></i></td>
+                  <td class="view" ><i class="fa" id="pasteviewicon" lquery="(add-class (format NIL &quot;view-~a&quot; view)) (text (plaster::view->name view))"></i></td>
                   <td class="parent"><a href="/view?id=ID" lquery="(text (plaster::id->hash pid)) (attr :href (plaster::paste-url pid))"></a></td>
                   <td class="type" lquery="(text (plaster::type->title type))"></td>
                   <td lquery="(text (plaster::format-time time))" class="label unixtime date"></td>

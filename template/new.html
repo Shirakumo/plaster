@@ -22,7 +22,7 @@
     </header>
     <div id="content">
       <when test=":error">
-        <div class="notice error" lquery="(text :error)"></div>
+        <div class="notice error" lquery="(text (clipboard ':error))"></div>
       </when>
       <form id="maineditor" class="editorarea edit" action="#" method="post">
         <div class="posterinfo">
@@ -44,13 +44,13 @@
         </div>
         <div class="editor">
           <ul class="editorbar buttonbar">
-            <unless test=":user">
+            <when test="(and (not :user) (config-tree ':plaster ':captcha))">
               <li id="captcha">
                 <label>Finish the word: </label>
-                <input type="hidden" name="hash" value="HASH" lquery="(val :captcha-hash)" />
-                <input type="text" name="captcha" value="CAPTCHA" lquery="(val :captcha)" />
+                <input type="hidden" name="hash" value="HASH" lquery="(val (clipboard ':captcha-hash))" />
+                <input type="text" name="captcha" value="CAPTCHA" lquery="(val (clipboard ':captcha))" />
               </li>
-            </unless>
+            </when>
             <li>
               <button type="submit" name="action" value="paste" class="paste" title="Save your paste!">
                 <i class="fa fa-check"></i> Paste!</button></li>

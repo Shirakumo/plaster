@@ -44,12 +44,12 @@
                   <i class="fa fa-quote-left"></i> Annotate</button></li>
               <li>
                 <button type="submit" name="action" class="raw" formaction="/api/plaster/raw?id=ID" title="View the code in raw form"
-                        lquery="(attr :formaction (format NIL &quot;/api/plaster/raw?id=~a&quot; (id->hash _id)))">
+                        lquery="(attr :formaction (format NIL &quot;/api/plaster/raw?id=~a&quot; (plaster::id->hash _id)))">
                   <i class="fa fa-file-text"></i> Raw</button></li>
               <when test="editable">
                 <li>
                   <button type="submit" name="action" class="edit" formaction="/edit?id=ID" title="Edit this paste"
-                          lquery="(attr :formaction (format NIL &quot;/edit/~a&quot; (id->hash _id))">
+                          lquery="(attr :formaction (format NIL &quot;/edit/~a&quot; (plaster::id->hash _id)))">
                     <i class="fa fa-edit"></i> Edit</button></li>
               </when>
               <li class="editorwrapping" title="Toggle line wrap">
@@ -57,7 +57,7 @@
               <li class="editorresize" title="Change editor height - Double click to fit content">
                 <i class="fa fa-sort"></i></li>
             </ul>
-            <input type="hidden" name="id" value="ID" lquery="(val (id->hash _id))"/>
+            <input type="hidden" name="id" value="ID" lquery="(val (plaster::id->hash _id))"/>
             <textarea class="code" name="text" lquery="(text text)">CODE</textarea>
           </form>
         </div>
@@ -68,7 +68,7 @@
         <div class="editorarea annotation">
           <div class="posterinfo">
             <img src="https://secure.gravatar.com/avatar/daa167d57e692a423067fceba30aadf8?s=128&amp;d=mm" lquery="(attr :src (profile:avatar author 64))"/>
-            <a id="annotation-ID" href="#annotation-ID" lquery="(attr :id (format NIL &quot;annotation-~a&quot; (id->hash _id)) :href (format NIL &quot;#annotation-~a&quot; (id->hash _id)))">
+            <a id="annotation-ID" href="#annotation-ID" lquery="(attr :id (format NIL &quot;annotation-~a&quot; (plaster::id->hash _id)) :href (format NIL &quot;#annotation-~a&quot; (plaster::id->hash _id)))">
               <h2 lquery="(text title)">TITLE</h2>
             </a>
             <div class="pasteinfo">
@@ -85,12 +85,12 @@
                   <i class="fa fa-retweet"></i> Repaste</button></li>
               <li>
                 <button type="submit" name="action" class="raw" formaction="/api/plaster/raw?id=ID" title="View the code in raw form"
-                        lquery="(attr :formaction (format NIL &quot;/api/plaster/raw?id=~a&quot; (id->hash _id)))">
+                        lquery="(attr :formaction (format NIL &quot;/api/plaster/raw?id=~a&quot; (plaster::id->hash _id)))">
                   <i class="fa fa-file-text"></i> Raw</button></li>
               <when test="editable">
                 <li>
                   <button type="submit" name="action" class="edit" formaction="/edit?id=ID" title="Edit this paste"
-                          lquery="(attr :formaction (format NIL &quot;/edit/~a&quot; (id->hash _id))">
+                          lquery="(attr :formaction (format NIL &quot;/edit/~a&quot; (plaster::id->hash _id)))">
                     <i class="fa fa-edit"></i> Edit</button></li>
               </when>
               <li class="editorwrapping" title="Toggle line wrap">
@@ -98,7 +98,7 @@
               <li class="editorresize" title="Change editor height - Double click to fit content">
                 <i class="fa fa-sort"></i></li>
             </ul>
-            <input type="hidden" name="id" value="ID" lquery="(val (id->hash _id))"/>
+            <input type="hidden" name="id" value="ID" lquery="(val (plaster::id->hash _id))"/>
             <textarea class="code" name="text" lquery="(text text)">CODE</textarea>
           </form>
         </div>   
@@ -112,7 +112,7 @@
       window.mirrorTheme="default";
     </script>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-    <script type="text/javascript" src="/static/plaster/codemirror-3.21/lib/codemirror.js"></script>
+    <script type="text/javascript" src="/static/plaster/codemirror/lib/codemirror.js"></script>
     <script type="text/javascript" src="/static/plaster/plaster.js"></script>
   </body>
 </html>

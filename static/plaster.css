@@ -14,7 +14,7 @@ body{
 }
 
 header{
-    background: #151515;
+    background: #000;
     color: #FFF;
 }
 
@@ -181,7 +181,6 @@ h3:after{
 #annotations{
     border-top: 5px solid #0088EE;
     background: transparent;
-    padding-top: 10px;
     margin-top: -3px;
 }
 
@@ -431,7 +430,6 @@ th.date.sorting_asc:after, th.date.sorting_desc:after{
     border: 1px solid #000;
     padding: 5px 10px 5px 10px;
     font-size: 16pt;
-    margin: 5px;
 }
 
 .notice.error{

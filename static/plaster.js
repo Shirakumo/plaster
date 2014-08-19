@@ -1,8 +1,10 @@
 $(function(){
+    var codemirror_home = "/static/plaster/codemirror/";
+    
     if(window.mirrorTheme != undefined && window.mirrorTheme != "default")
         $("<link>").appendTo($("head"))
                    .attr({type: "text/css", rel: "stylesheet"})
-                   .attr("href", "/static/js/plaster/codemirror-3.21/theme/"+window.mirrorTheme+".css");
+                   .attr("href", codemirror_home+"theme/"+window.mirrorTheme+".css");
         
     function setupEditor(i, editor){
         var mirror;
@@ -72,7 +74,7 @@ $(function(){
                 (function(mode, prevfunc){
                     funcs.push(function(){
                         console.log("Loading mode "+mode);
-                        $.getScript("/static/js/plaster/codemirror-3.21/mode/"+mode+"/"+mode+".js")
+                        $.getScript(codemirror_home+"mode/"+mode+"/"+mode+".js")
                             .done(function(){prevfunc();})
                             .fail(function(){console.log("Failed to load mode "+mode); failfunc();});});
                 })(modes[i], funcs[i]);

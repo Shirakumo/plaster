@@ -14,10 +14,11 @@
   :license "Artistic" 
   :homepage "http://github.com/Shinmera/radiance-plaster"
   :components ((:file "module")
+               (:file "toolkit")
+               (:file "api")
                (:file "frontend")
                ;;(:file "backend")
-               (:file "pastebin-type-map")
-               (:file "api"))
+               (:file "pastebin-type-map"))
   :depends-on ((:interface :database)
                (:interface :data-model)
                (:interface :user)
