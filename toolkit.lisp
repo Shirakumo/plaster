@@ -16,7 +16,7 @@
   (db:create 'plaster '((pid :id) (title (:varchar 64)) (author (:varchar 32)) (type (:varchar 32))
                         (time (:integer 5)) (text :text) (view (:integer 2)) (hits :integer) (ip (:varchar 16)))
              :indices '(pid author ip))
-  (db:create 'plaster-types '((title (:varchar 16)) (name (:varchar 64)) (mime (:varchar 32))))
+  (db:create 'plaster-types '((title (:varchar 32)) (name (:varchar 64)) (mime (:varchar 32))))
   (db:create 'plaster-users '((user (:varchar 32)) (theme (:varchar 32)) (default-type (:varchar 16))) :indices '(user))
   (db:create 'plaster-themes '((title (:varchar 32)) (name (:varchar 32)))))
 
