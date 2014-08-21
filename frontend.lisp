@@ -138,12 +138,12 @@
              (when-let ((model (dm:get-one 'plaster-users (db:query (:= 'user (user:username user))))))
                ($ "#editorthemescript" (text (format NIL "window.mirrorTheme=\"~a\";" (dm:field model "theme")))))
              ($ "#title" (attr :value title))
-             ($ (inline (format NIL "#typeselect option[value=\"~a\"]" type)) (attr :selected "selected"))
-             ($ (inline (format NIL "#viewselect option[value=\"~a\"]" view)) (attr :selected "selected"))
              ($ "#viewpassword" (attr :value (or password "")))))))
     (r-clip:process
      ($ (node))
      :user user
      :paste paste
      :error err
-     :types (dm:get 'plaster-types (db:query :all) :sort '((title :ASC))))))
+     :types (dm:get 'plaster-types (db:query :all) :sort '((title :ASC))))
+    ($ (inline (format NIL "#typeselect option[value=\"~a\"]" (or (post-var "type") (dm:field paste "type")))) (attr :selected "selected"))
+    ($ (inline (format NIL "#viewselect option[value=\"~a\"]" (or (post-var "view") (dm:field paste "view")))) (attr :selected "selected"))))
