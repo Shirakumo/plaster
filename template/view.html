@@ -21,6 +21,9 @@
       </nav>
     </header>
     <div id="content">
+      <when test=":error">
+        <div class="notice error" lquery="(text (clipboard ':error))"></div>
+      </when>
       <using field=":paste">
         <div id="maineditor" class="editorarea">
           <div class="posterinfo">

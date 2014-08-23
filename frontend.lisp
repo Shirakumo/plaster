@@ -30,10 +30,11 @@
 
 (define-page plaster-view #@"plaster/^view(/([0-9a-zA-Z]*))?" (:uri-groups (NIL id) :lquery (template "view.html"))
   (let* ((user (auth:current))
-         (paste (dm:get-one 'plaster (db:query (:and (:= '_id (hash->id (or id (get-var "id")))) (:= 'pid -1))))))
+         (paste (dm:get-one 'plaster (db:query (:and (:= '_id (hash->id (or id (get-var "id")))) (:= 'pid -1)))))
+         (err NIL))
     (cond
       ((not paste)
-       ($ "#content" (html "<h2>No such paste found.</h2>")))
+       (setf err "No such paste found."))
       ((not (paste-accessible-p paste user))
        (if (= (dm:field paste "view") 3)
            ($ "#content" (html-file (template "plaster/passwordprompt.html")))
@@ -50,6 +51,7 @@
      ($ (node))
      :user user
      :paste paste
+     :error err
      :annots (when paste
                (mapc #'(lambda (model)
                            (when (= (dm:field model "view") 3)
@@ -115,8 +117,7 @@
          (err))
     (cond
       ((not paste)
-       (setf err "No such paste found."
-             paste NIL))
+       (setf err "No such paste found."))
       ((not (paste-editable-p paste user))
        (setf err "You are not allowed to edit this paste."
              paste NIL))
@@ -145,5 +146,6 @@
      :paste paste
      :error err
      :types (dm:get 'plaster-types (db:query :all) :sort '((title :ASC))))
-    ($ (inline (format NIL "#typeselect option[value=\"~a\"]" (or (post-var "type") (dm:field paste "type")))) (attr :selected "selected"))
-    ($ (inline (format NIL "#viewselect option[value=\"~a\"]" (or (post-var "view") (dm:field paste "view")))) (attr :selected "selected"))))
+    (when paste
+      ($ (inline (format NIL "#typeselect option[value=\"~a\"]" (or (post-var "type") (dm:field paste "type")))) (attr :selected "selected"))
+      ($ (inline (format NIL "#viewselect option[value=\"~a\"]" (or (post-var "view") (dm:field paste "view")))) (attr :selected "selected")))))
