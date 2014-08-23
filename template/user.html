@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8"/>
-    <title><splice lquery="(text (user:username :user))"></splice> Profile - Plaster</title>
+    <title><splice lquery="(text (if :user (user:username :user) &quot;&quot;))"></splice> Profile - Plaster</title>
     <link rel="stylesheet" href="/static/plaster/plaster.css" />
     <link href="/static/plaster/codemirror/lib/codemirror.css" rel="stylesheet" />
     <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet" />
@@ -61,7 +61,7 @@
           </div>
         </then>
         <else>
-          <h2>No such user found!</h2>
+          <div class="notice error">No such user found.</div>
         </else>
       </if>
     </div>

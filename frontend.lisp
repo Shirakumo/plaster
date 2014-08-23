@@ -19,11 +19,11 @@
     (r-clip:process
      ($ (node))
      :user viewuser
-     :pastes (if (and user (string= (user:username user) (user:username viewuser)))
+     :pastes (if (and viewuser user (string= (user:username user) (user:username viewuser)))
                  (dm:get 'plaster (db:query (:and (:= 'pid -1) (:= 'author username))) :sort '((time :DESC)))
                  (dm:get 'plaster (db:query (:and (:= 'pid -1) (:= 'view 0) (:= 'author username)))
                          :sort '((time :DESC)) :amount *user-pastes-per-page* :skip (* *user-pastes-per-page* (1- page))))
-     :annots (if (and user (string= (user:username user) (user:username viewuser)))
+     :annots (if (and viewuser user (string= (user:username user) (user:username viewuser)))
                  (dm:get 'plaster (db:query (:and (:!= 'pid -1) (:= 'author username))) :sort '((time :DESC)))
                  (dm:get 'plaster (db:query (:and (:!= 'pid -1) (:= 'view 0) (:= 'author username)))
                          :sort '((time :DESC)) :amount *user-pastes-per-page* :skip (* *user-pastes-per-page* (1- page)))))))
