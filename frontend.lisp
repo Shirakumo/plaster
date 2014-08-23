@@ -85,19 +85,13 @@
         (if (or (config-tree :plaster :anon) user)
             (progn
               ($ ".code" (text text))
-              ($ (inline (format NIL "#viewselect option[value=\"~a\"]" view)) (attr :selected "selected"))
               ($ "#title" (val title))
               ($ "#viewpassword" (val password))
               (when user
                 (when-let ((model (dm:get-one 'plaster-users (db:query (:= 'user (user:username user))))))
                   ($ "#editorthemescript" (text (format NIL "window.mirrorTheme=\"~a\";" (dm:field model "theme"))))
                   (unless type
-                    (setf type (dm:field model "default-type")))))
-              (when annotate
-                ($ "#annotateinfo" (text (format NIL "Annotating paste ~a." (id->hash (dm:field annotate "_id")))))
-                ($ "#viewselect" (parent) (replace-with "public/private depending on its parent"))
-                ($ "#annotateid" (attr :value (id->hash (dm:field annotate "_id")))))
-              ($ (inline (format NIL "#typeselect option[value=\"~a\"]" (or type "text/plain"))) (attr :selected "selected")))
+                    (setf type (dm:field model "default-type"))))))
             (setf err "Anonymous pasting is not permitted. Please log in first."))
         (setf err "You are not allowed to repaste/annotate this paste."))
     (multiple-value-bind (captcha hash) (generate-captcha)
@@ -107,7 +101,13 @@
        :captcha captcha
        :captcha-hash hash
        :error err
-       :types (dm:get 'plaster-types (db:query :all) :sort '((title :ASC)))))))
+       :types (dm:get 'plaster-types (db:query :all) :sort '((title :ASC)))))
+    ($ (inline (format NIL "#viewselect option[value=\"~a\"]" view)) (attr :selected "selected"))
+    (when annotate
+      ($ "#annotateinfo" (text (format NIL "Annotating paste ~a." (id->hash (dm:field annotate "_id")))))
+      ($ "#viewselect" (parent) (replace-with "public/private depending on its parent"))
+      ($ "#annotateid" (attr :value (id->hash (dm:field annotate "_id")))))
+    ($ (inline (format NIL "#typeselect option[value=\"~a\"]" (or type "text/plain"))) (attr :selected "selected"))))
 
 (define-page plaster-edit #@"plaster/^edit(/([0-9a-zA-Z]*))?" (:uri-groups (NIL id) :lquery (template "edit.html"))
   (let* ((user (or (auth:current) (user:get :anonymous)))
