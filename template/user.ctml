@@ -37,7 +37,7 @@
                 <tr class="paste">
                   <td class="title"><a href="/view?id=ID" lquery="(text title) (attr :href (plaster::paste-url _id))"></a></td>
                   <td class="view" ><i class="fa" id="pasteviewicon" lquery="(add-class (format NIL &quot;view-~a&quot; view)) (text (plaster::view->name view))"></i></td>
-                  <td class="hits" lquery="(text (princ-to-string hits))"></td>
+                  <td class="hits" lquery="(text hits)"></td>
                   <td class="type" lquery="(text (plaster::type->title type))"></td>
                   <td lquery="(text (plaster::format-time time))" class="label unixtime date"></td>
                 </tr>
