@@ -83,19 +83,21 @@
         decrypted))))
 
 (defun paste-accessible-p (paste &optional (user (auth:current)))
+  ;; The order of tests is significant since otherwise the decryption side-effect
+  ;; cannot take place. This is worse for performance on average, but dismissable.
   (and paste
-       (or (and user (user:check user "plaster.admin"))
-           (and (or (not (= (dm:field paste "view") 2))
-                    (and user (string-equal (user:username user) (dm:field paste "author"))))
-                (or (not (= (dm:field paste "view") 3))
+       (or (and (or (not (= (dm:field paste "view") 3))
                     (and (post/get "password")
                          (< 0 (length (post/get "password")))
                          ;; We've come this far, decrypt it and set it so we don't have to do it twice.
                          (setf (field paste "text")
                                (decrypt (dm:field paste "text") (post/get "password")))))
+                (or (not (= (dm:field paste "view") 2))
+                    (and user (string-equal (user:username user) (dm:field paste "author"))))
                 ;; View permissions cascade from parent, so check it.
                 (or (= (dm:field paste "pid") -1)
-                    (paste-accessible-p (dm:get-one 'plaster (db:query (:= '_id (dm:field paste "pid")))) user))))))
+                    (paste-accessible-p (dm:get-one 'plaster (db:query (:= '_id (dm:field paste "pid")))) user)))
+           (and user (user:check user "plaster.admin")))))
 
 (defparameter *captcha-salt* (make-random-string))
 (defparameter *captchas* '("divisible" "determined" "questionable" "difficult" "simplistic" "always" "never" "however" "occasionally" "certainly"
