@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8"/>
-    <title><splice lquery="(text (clip :paste 'title))"></splice> - Paste # - Plaster</title>
+    <title><c:splice lquery="(text (clip paste 'title))" /> - Paste # - Plaster</title>
     <link rel="stylesheet" href="/static/plaster/plaster.css" />
     <link href="/static/plaster/codemirror/lib/codemirror.css" rel="stylesheet" />
     <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet" />
@@ -13,19 +13,19 @@
       <nav>
         <ul class="buttonbar">
           <li><a href="/new" title="Submit a new paste"><i class="fa fa-edit"></i> New Paste</a></li>
-          <when test=":user">
-            <li><a href="/user/USERNAME" title="Return to your profile" lquery="(attr :href (plaster::user-url :user))"><i class="fa fa-user"></i> My Profile</a></li>
-          </when>
+          <c:when test="user">
+            <li><a href="/user/USERNAME" title="Return to your profile" lquery="(attr :href (plaster::user-url user))"><i class="fa fa-user"></i> My Profile</a></li>
+          </c:when>
           <li><a href="/recent" title="View a list of recent pastes"><i class="fa fa-list"></i> Public List</a></li>
         </ul>
       </nav>
     </header>
     <div id="content">
-      <when test=":error">
-        <div class="notice error" lquery="(text (clipboard ':error))"></div>
-      </when>
-      <when test=":paste">
-        <using field=":paste">
+      <c:when test="error">
+        <div class="notice error" lquery="(text error)"></div>
+      </c:when>
+      <c:when test="paste">
+        <c:using field="paste">
           <div id="maineditor" class="editorarea">
             <div class="posterinfo">
               <img src="https://secure.gravatar.com/avatar/daa167d57e692a423067fceba30aadf8?s=128&amp;d=mm" lquery="(attr :src (profile:avatar author 64))"/>
@@ -40,22 +40,22 @@
               <ul class="editorbar buttonbar">
                 <li>
                   <button type="submit" name="action" class="repaste" formaction="/new?repaste=ID" title="Submit as a new paste"
-                          lquery="(attr :formaction (plaster::new-url ':repaste _id))">
+                          lquery="(attr :formaction (plaster::new-url :repaste _id))">
                     <i class="fa fa-retweet"></i> Repaste</button></li>
                 <li>
                   <button type="submit" name="action" class="annotate" formaction="/new?annotate=ID" title="Annotate this paste"
-                          lquery="(attr :formaction (plaster::new-url ':annotate _id))">
+                          lquery="(attr :formaction (plaster::new-url :annotate _id))">
                     <i class="fa fa-quote-left"></i> Annotate</button></li>
                 <li>
                   <button type="submit" name="action" class="raw" formaction="/api/plaster/raw?id=ID" title="View the code in raw form"
                           lquery="(attr :formaction (format NIL &quot;/api/plaster/raw?id=~a&quot; (plaster::id->hash _id)))">
                     <i class="fa fa-file-text"></i> Raw</button></li>
-                <when test="editable">
+                <c:when test="editable">
                   <li>
                     <button type="submit" name="action" class="edit" formaction="/edit?id=ID" title="Edit this paste"
                             lquery="(attr :formaction (format NIL &quot;/edit/~a&quot; (plaster::id->hash _id)))">
                       <i class="fa fa-edit"></i> Edit</button></li>
-                </when>
+                </c:when>
                 <li class="editorwrapping" title="Toggle line wrap">
                   <i class="fa fa-arrows-h"></i></li>
                 <li class="editorresize" title="Change editor height - Double click to fit content">
@@ -65,10 +65,10 @@
               <textarea class="code" name="text" lquery="(text text)">CODE</textarea>
             </form>
           </div>
-        </using>
+        </c:using>
 
         <h3>Annotations</h3>
-        <div id="annotations" iterate=":annots">
+        <div id="annotations" iterate="annots">
           <div class="editorarea annotation">
             <div class="posterinfo">
               <img src="https://secure.gravatar.com/avatar/daa167d57e692a423067fceba30aadf8?s=128&amp;d=mm" lquery="(attr :src (profile:avatar author 64))"/>
@@ -85,18 +85,18 @@
               <ul class="editorbar buttonbar">
                 <li>
                   <button type="submit" name="action" class="repaste" formaction="/new?repaste=ID" title="Submit as a new paste"
-                          lquery="(attr :formaction (plaster::new-url ':repaste _id))">
+                          lquery="(attr :formaction (plaster::new-url :repaste _id))">
                     <i class="fa fa-retweet"></i> Repaste</button></li>
                 <li>
                   <button type="submit" name="action" class="raw" formaction="/api/plaster/raw?id=ID" title="View the code in raw form"
                           lquery="(attr :formaction (format NIL &quot;/api/plaster/raw?id=~a&quot; (plaster::id->hash _id)))">
                     <i class="fa fa-file-text"></i> Raw</button></li>
-                <when test="editable">
+                <c:when test="editable">
                   <li>
                     <button type="submit" name="action" class="edit" formaction="/edit?id=ID" title="Edit this paste"
                             lquery="(attr :formaction (format NIL &quot;/edit/~a&quot; (plaster::id->hash _id)))">
                       <i class="fa fa-edit"></i> Edit</button></li>
-                </when>
+                </c:when>
                 <li class="editorwrapping" title="Toggle line wrap">
                   <i class="fa fa-arrows-h"></i></li>
                 <li class="editorresize" title="Change editor height - Double click to fit content">
@@ -107,7 +107,7 @@
             </form>
           </div>   
         </div>
-      </when>
+      </c:when>
     </div>
     <footer>
       Site &#169;2014 TymoonNET/NexT. Plaster uses <a href="http://codemirror.net/">Code Mirror</a> for fancy editing and display. <br />

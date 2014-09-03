@@ -9,10 +9,10 @@
 (define-page plaster-index #@"plaster/^$" ()
   (redirect "/new"))
 
-(define-page plaster-list #@"plaster/^recent" (:lquery (template "list.html"))
+(define-page plaster-list #@"plaster/^recent" (:lquery (template "list.ctml"))
   (r-clip:process ($ (node)) :pastes (dm:get 'plaster (db:query (:and (:= 'view 0) (:= 'pid -1))) :sort '((time :DESC)) :amount *public-pastes-limit*)))
 
-(define-page plaster-user #@"plaster/^user/([^/]*)(/([0-9]+))?" (:uri-groups (username NIL page) :lquery (template "user.html"))
+(define-page plaster-user #@"plaster/^user/([^/]*)(/([0-9]+))?" (:uri-groups (username NIL page) :lquery (template "user.ctml"))
   (let ((user (auth:current))
         (viewuser (user:get username))
         (page (or (parse-integer (or page "") :junk-allowed T) 1)))
@@ -28,7 +28,7 @@
                  (dm:get 'plaster (db:query (:and (:!= 'pid -1) (:= 'view 0) (:= 'author username)))
                          :sort '((time :DESC)) :amount *user-pastes-per-page* :skip (* *user-pastes-per-page* (1- page)))))))
 
-(define-page plaster-view #@"plaster/^view(/([0-9a-zA-Z]*))?" (:uri-groups (NIL id) :lquery (template "view.html"))
+(define-page plaster-view #@"plaster/^view(/([0-9a-zA-Z]*))?" (:uri-groups (NIL id) :lquery (template "view.ctml"))
   (let* ((user (auth:current))
          (paste (dm:get-one 'plaster (db:query (:and (:= '_id (hash->id (or id (get-var "id")))) (:= 'pid -1)))))
          (err NIL))
@@ -37,7 +37,7 @@
        (setf err "No such paste found."))
       ((not (paste-accessible-p paste user))
        (if (= (dm:field paste "view") 3)
-           ($ "#content" (html-file (template "plaster/passwordprompt.html")))
+           ($ "#content" (html-file (template "plaster/passwordprompt.ctml")))
            ($ "#content" (html "<h2>You are not allowed to view this paste.</h2>"))))
       (T
        (setf (dm:field paste "editable") (paste-editable-p paste user))
@@ -59,7 +59,7 @@
                              (setf (dm:field model "editable") (paste-editable-p model user))))
                        (dm:get 'plaster (db:query (:= 'pid (dm:id paste))) :sort '((time :ASC))))))))
 
-(define-page plaster-new #@"plaster/^new" (:lquery (template "new.html"))
+(define-page plaster-new #@"plaster/^new" (:lquery (template "new.ctml"))
   (let* ((user (auth:current))
          (annotate (when-let ((annotate-id (get-var "annotate")))
                      (dm:get-one 'plaster (db:query (:and (:= '_id (hash->id annotate-id)) (:= 'pid -1))))))
@@ -111,7 +111,7 @@
       ($ "#annotateid" (attr :value (id->hash (dm:field annotate "_id")))))
     ($ (inline (format NIL "#typeselect option[value=\"~a\"]" (or type "text/plain"))) (attr :selected "selected"))))
 
-(define-page plaster-edit #@"plaster/^edit(/([0-9a-zA-Z]*))?" (:uri-groups (NIL id) :lquery (template "edit.html"))
+(define-page plaster-edit #@"plaster/^edit(/([0-9a-zA-Z]*))?" (:uri-groups (NIL id) :lquery (template "edit.ctml"))
   (let* ((user (or (auth:current) (user:get :anonymous)))
          (paste (dm:get-one 'plaster (db:query (:= '_id (hash->id (or id (post/get "id")))))))
          (err))
@@ -123,7 +123,7 @@
              paste NIL))
       (T
        (if (not (paste-accessible-p paste user))
-           ($ "#content" (html-file (template "plaster/passwordprompt.html")))
+           ($ "#content" (html-file (template "plaster/passwordprompt.ctml")))
            (let* ((text (or (post-var "text") (dm:field paste "text")))
                   (title (or (post-var "title") (dm:field paste "title")))
                   (type (or (post-var "type") (dm:field paste "type")))

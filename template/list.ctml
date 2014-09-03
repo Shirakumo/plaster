@@ -29,7 +29,7 @@
         <thead>
           <tr><th class="title">Title</th><th class="type">Type</th><th class="author">Author</th><th class="date">Time</th></tr>
         </thead>
-        <tbody iterate=":pastes">
+        <tbody iterate="pastes">
           <tr class="paste">
             <td class="title"><a href="/view?id=ID" lquery="(text title) (attr :href (plaster::paste-url _id))"></a></td>
             <td class="type" lquery="(text (plaster::type->title type))"></td>

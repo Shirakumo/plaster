@@ -13,37 +13,40 @@
       <nav>
         <ul class="buttonbar">
           <li><a href="/new" title="Submit a new paste"><i class="fa fa-edit"></i> New Paste</a></li>
-          <when test="(auth:current)">
+          <c:when test="(auth:current)">
             <li><a href="/user/USERNAME" title="Return to your profile" lquery="(attr :href (plaster::user-url (auth:current)))"><i class="fa fa-user"></i> My Profile</a></li>
-          </when>
+          </c:when>
           <li><a href="/recent" title="View a list of recent pastes"><i class="fa fa-list"></i> Public List</a></li>
         </ul>
       </nav>
     </header>
     <div id="content">
-      <when test=":error">
-        <div class="notice error" lquery="(text (clipboard ':error))"></div>
-      </when>
-      <when test=":paste">
-        <form id="maineditor" class="editorarea edit" method="post" action="#">
-          <div class="posterinfo">
-            <img src="https://secure.gravatar.com/avatar/daa167d57e692a423067fceba30aadf8?s=128&amp;d=mm" lquery="(attr :src (profile:avatar (clip :paste 'author) 64))"/>
-            <input type="text" id="title" maxlength="64" placeholder="Title" name="title"></input>
-            <div class="pasteinfo">
-              <span id="annotateinfo"></span>
-              Paste as <div class="selectordiv"><select name="type" id="typeselect" title="Select the language or mode to use to display and edit your paste."
-                                                        iterate=":types">
-                  <option value="VALUE" data-mode="MODE" lquery="(val mime) (text title) (attr :data-mode name)">TITLE</option>
-              </select></div>.
-              This paste will be <div class="selectordiv"><select name="view" id="viewselect" title="Select how your paste will be visible to the internet. Note that encryption passwords are not stored.">
+      <c:when test="error">
+        <div class="notice error" lquery="(text error)"></div>
+      </c:when>
+      <c:when test="paste">
+        <c:using field="paste">
+          <form id="maineditor" class="editorarea edit" method="post" action="#">
+            <div class="posterinfo">
+              <img src="https://secure.gravatar.com/avatar/daa167d57e692a423067fceba30aadf8?s=128&amp;d=mm" lquery="(attr :src (profile:avatar author 64))"/>
+              <input type="text" id="title" maxlength="64" placeholder="Title" name="title"></input>
+              <div class="pasteinfo">
+                <span id="annotateinfo"></span>
+                Paste as
+                <div class="selectordiv">
+                  <select name="type" id="typeselect" title="Select the language or mode to use to display and edit your paste."
+                          iterate="(** types)">
+                    <option value="VALUE" data-mode="MODE" lquery="(val mime) (text title) (attr :data-mode name)">TITLE</option>
+                  </select>
+                </div>.
+                This paste will be <div class="selectordiv"><select name="view" id="viewselect" title="Select how your paste will be visible to the internet. Note that encryption passwords are not stored.">
                   <option value="0">public</option>
                   <option value="1">unlisted</option>
                   <option value="2">private</option>
                   <option value="3">encrypted with:</option>
-              </select></div> <input type="password" name="password" placeholder="Password" id="viewpassword" autocomplete="off" maxlength="32" minlength="6"/>.
+                </select></div> <input type="password" name="password" placeholder="Password" id="viewpassword" autocomplete="off" maxlength="32" minlength="6"/>.
+              </div>
             </div>
-          </div>
-          <using field=":paste">
             <div class="editor" method="post">
               <ul class="editorbar buttonbar">
                 <li>
@@ -61,9 +64,9 @@
               <input type="hidden" name="id" value="ID" id="editid" lquery="(val (plaster::id->hash _id))" />
               <textarea class="code" name="text" placeholder="Text" lquery="(text text)">Text</textarea>
             </div>
-          </using>
-        </form>
-        </when>
+          </form>
+        </c:using>
+      </c:when>
     </div>
     <footer>
       Site &#169;2014 TymoonNET/NexT. Plaster uses <a href="http://codemirror.net/">Code Mirror</a> for fancy editing and display. <br />
