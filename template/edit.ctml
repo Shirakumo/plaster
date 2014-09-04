@@ -35,7 +35,7 @@
                 Paste as
                 <div class="selectordiv">
                   <select name="type" id="typeselect" title="Select the language or mode to use to display and edit your paste."
-                          iterate="(** types)">
+                          iterate="(** 'types)">
                     <option value="VALUE" data-mode="MODE" lquery="(val mime) (text title) (attr :data-mode name)">TITLE</option>
                   </select>
                 </div>.
