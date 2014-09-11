@@ -42,10 +42,11 @@
 
   (admin:define-panel preferences plaster (:lquery (template "admin-preferences.ctml") :icon "" :tooltip "")
     (let* ((username (user:username (auth:current)))
-           (prefs (dm:get-one 'plaster-users (db:query (:= "user" username)))))
+           (prefs (dm:get-one 'plaster-users (db:query (:= 'user username)))))
 
       (r-clip:process
        T
+       :notice (get-var "notice")
        :themes (dm:get 'plaster-themes (db:query :all))
        :types (dm:get 'plaster-types (db:query :all)))
       

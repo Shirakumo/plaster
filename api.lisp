@@ -176,58 +176,59 @@
                                  (if (= (dm:field paste "pid") -1) id (id->hash (dm:field paste "pid"))) password))
         "Paste deleted.")))
 
-;; (define-api user/settings () (:method :GET :access-branch "*")
-;;   "View user settings."
-;;   (let ((prefs (dm:get-one "plaster-user" (db:query (:= "user" (user:field (user:current) "username"))))))
-;;     (core:api-return 200 "User settings."
-;;                      :data (plist->hash-table
-;;                             :username (user:field (user:current) "username")
-;;                             :theme (if prefs (dm:field prefs "theme") "default")
-;;                             :default-type (if prefs (dm:field prefs "default-type") "text")))))
+(define-api plaster/user/settings () ()
+  "View user settings."
+  (let ((prefs (dm:get-one 'plaster-users (db:query (:= 'user (user:username (auth:current)))))))
+    (api-output
+     (alexandria:plist-hash-table
+      (list :username (user:username (auth:current))
+            :theme (if prefs (dm:field prefs "theme") "default")
+            :default-type (if prefs (dm:field prefs "default-type") "text"))))))
 
-;; (define-api user/settings/save (&optional theme type nuke (client "false")) (:method T :access-branch "*")
-;;   "Change user settings."
-;;   (user-save theme type nuke client))
+(define-api plaster/user/settings/save (&optional theme type nuke (client "false")) ()
+  "Change user settings."
+  (user-save theme type nuke client))
 
-;; (defun user-save (theme type nuke client)
-;;   (let ((username (user:field (user:current) "username"))
-;;         (client (string-equal client "true")))
-;;     (assert-api (:apicall "user/settings/save" :module "plaster" :code 400 :text)
-;;       ((or (not theme) (db:select "plaster-themes" (db:query (:= "name" theme))))
-;;        "Not a valid theme.")
-;;       ((or (not type) (db:select "plaster-types" (db:query (:= "mime" type))))
-;;        "Not a valid type."))
+(defun user-save (theme type nuke client)
+  (let ((username (user:username (auth:current)))
+        (client (string-equal client "true")))
+    (assert-api
+      ((or (not theme) (db:select 'plaster-themes (db:query (:= 'name theme))))
+       (format NIL "Not a valid theme ~s." theme))
+      ((or (not type) (db:select 'plaster-types (db:query (:= 'mime type))))
+       (format NIL "Not a valid type ~s." type)))
     
-;;     (let ((prefs (dm:get-one "plaster-user" (db:query (:= "user" username)))))
-;;       (when (null prefs)
-;;         (setf prefs (dm:hull "plaster-user")
-;;               (dm:field prefs "user") username))
-;;       (when theme (setf (dm:field prefs "theme") (server:post "theme")))
-;;       (when type (setf (dm:field prefs "default-type") (server:post "type")))
-;;       (if (dm:hull-p prefs)
-;;           (dm:insert prefs)
-;;           (dm:save prefs)))
+    (with-model prefs ('plaster-users (db:query (:= 'user username)))
+      (when (null prefs)
+        (setf prefs (dm:hull 'plaster-users)
+              (dm:field prefs "user") username))
+      (when theme (setf (dm:field prefs "theme") (post-var "theme")))
+      (when type (setf (dm:field prefs "default-type") (post-var "type")))
+      (if (dm:hull-p prefs)
+          (dm:insert prefs)
+          (dm:save prefs)))
     
-;;     (when (and nuke (string= nuke "nuke"))
-;;       (let ((count (db:count "plaster" (db:query (:= "author" username)))))
-;;         (db:remove "plaster" (db:query (:= "author" username)))
-;;         (when client
-;;           (server:redirect (make-uri (format NIL "user./settings/plaster/preferences?notice=~a pastes deleted." count))))))
+    (when (and nuke (string= nuke "nuke"))
+      (let ((count (db:count 'plaster (db:query (:= 'author username)))))
+        (db:remove 'plaster (db:query (:= 'author username)))
+        (when client
+          (redirect (format NIL "/plaster/preferences?notice=~a pastes deleted." count))
+          (return-from user-save ""))))
 
-;;     (if client
-;;         (server:redirect (make-uri "user./settings/plaster/preferences?notice=Preferences updated."))
-;;         (core:api-return 200 "Preferences saved."))))
+    (if client
+        (redirect "/plaster/preferences?notice=Preferences updated.")
+        (api-output "Ok."))))
 
-;; (define-api user/import (&optional service) (:access-branch "*")
-;;   "Check if importing with the specified service is available. No service lists all available."
-;;   (if service
-;;       (core:api-return 200 service
-;;                        :data (plist->hash-table
-;;                               service (not (null (config-tree :plaster :import (find-symbol (string-upcase service) :KEYWORD))))))
-;;       (core:api-return 200 "Available imports"
-;;                        :data (mapcar #'car (config-tree :plaster :import)))))
+(define-api plaster/user/import (&optional service) ()
+  "Check if importing with the specified service is available. No service lists all available."
+  (if service
+      (api-output
+       (alexandria:plist-hash-table
+        (list service (not (null (config-tree :plaster :import (find-symbol (string-upcase service) :KEYWORD)))))))
+      (api-output
+       (mapcar #'car (config-tree :plaster :import)))))
 
-;; (define-api user/import/pastebin (username password &optional (client "false")) (:access-branch "*")
+;; (define-api plaster/user/import/pastebin (username password &optional (client "false")) ()
 ;;   "Import pastes from pastebin."
 ;;   (flet ((request (where &rest params)
 ;;            (apply #'drakma:http-request where :external-format-in :utf-8 :external-format-out :utf-8 params)))
@@ -286,7 +287,7 @@
 ;;                       (dm:insert model)))
 ;;                   (push ($ node "paste_key" (text) (node)) failed))))
 ;;           (if client
-;;               (server:redirect (make-uri (format NIL "user./settings/plaster/preferences?notice=~a pastes imported, ~a type adapted, ~a failed."
+;;               (redirect (make-uri (format NIL "user./settings/plaster/preferences?notice=~a pastes imported, ~a type adapted, ~a failed."
 ;;                                                  (length success) (length adapted) (length failed))))
 ;;               (core:api-return 200 "A"
 ;;                                :data (plist->hash-table

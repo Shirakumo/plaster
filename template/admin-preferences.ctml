@@ -1,11 +1,13 @@
 <div>
   <h2>Plaster Preferences</h2>
+  <c:when test="notice"><div class="notice info" lquery="(text notice)" /></c:when>
+  
   <form method="post" action="/api/plaster/user/settings/save" class="box">
     <label>Editor Theme:</label><select name="theme" id="theme" iterate="themes">
       <option value="VALUE" lquery="(val name) (text title)">NAME</option>
     </select><br />
     <label>Default Type:</label><select name="type" id="type" iterate="types">
-      <option value="VALUE" lquery="(val name) (text title)">NAME</option>
+      <option value="VALUE" lquery="(val mime) (text title)">NAME</option>
     </select><br />
     <label>Delete Everything:</label><input type="checkbox" name="nuke" value="nuke"/><br />
     <input type="hidden" name="client" value="true" />
@@ -14,16 +16,20 @@
     </div>
   </form>
 
-  <h2>Import Pastes</h2>
-  <form method="post" action="/api/plaster/user/import/pastebin" class="box" id="import-pastebin" autocomplete="off">
-    <h3>Pastebin</h3>
-    <label>Username:</label><input type="text" name="username" /><br />
-    <label>Password:</label><input type="password" name="password" /><br />
-    Your login credentials will not be stored on our servers in any way. Import is limited to 100 pastes.
-    <input type="hidden" name="service" value="pastebin" />
-    <input type="hidden" name="client" value="true" />
-    <div class="actionbar">
-      <input type="submit" name="action" value="Import" />
-    </div>
-  </form>
+  <c:when test="(config-tree :plaster :import)">
+    <h2>Import Pastes</h2>
+    <c:when test="(config-tree :plaster :import :pastebin)">
+      <form method="post" action="/api/plaster/user/import/pastebin" class="box" id="import-pastebin" autocomplete="off">
+        <h3>Pastebin</h3>
+        <label>Username:</label><input type="text" name="username" /><br />
+        <label>Password:</label><input type="password" name="password" /><br />
+        Your login credentials will not be stored on our servers in any way. Import is limited to 100 pastes.
+        <input type="hidden" name="service" value="pastebin" />
+        <input type="hidden" name="client" value="true" />
+        <div class="actionbar">
+          <input type="submit" name="action" value="Import" />
+        </div>
+      </form>
+    </c:when>
+  </c:when>
 </div>
