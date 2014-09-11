@@ -7,9 +7,9 @@
 (in-package #:cl-user)
 (asdf:defsystem plaster
   :class "radiance:module"
-  :defsystem-depends-on (:radiance)
-  :name "Plaster Pasting Service" 
+  :defsystem-depends-on (:radiance) 
   :author "Nicolas Hafner"
+  :description "A pasting service for Radiance."
   :version "0.0.1" 
   :license "Artistic" 
   :homepage "http://github.com/Shinmera/radiance-plaster"
