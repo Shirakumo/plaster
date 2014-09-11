@@ -28,7 +28,7 @@
        (let ((table (cond ((string= (post-var "form") "types") "plaster-types")
                           ((string= (post-var "form") "themes") "plaster-themes"))))
          (dolist (id (or (post-var "selected[]") (list (post-var "id"))))
-           (db:remove table (db:query (:= "_id" id)))))))
+           (db:remove table (db:query (:= '_id id)))))))
     
     ($ "input[name=\"anon\"]" (attr :checked (if (config-tree :plaster :anon) "checked")))
     ($ "input[name=\"captcha\"]" (attr :checked (if (config-tree :plaster :captcha) "checked")))
