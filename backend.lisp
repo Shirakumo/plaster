@@ -40,7 +40,7 @@
      :themes (dm:get 'plaster-themes (db:query :all))
      :types (dm:get 'plaster-types (db:query :all))))
 
-  (admin:define-panel preferences plaster (:lquery (template "admin-preferences.ctml") :icon "" :tooltip "")
+  (admin:define-panel preferences plaster (:lquery (template "admin-preferences.ctml") :icon "fa-wrench" :tooltip "Set your default editor preferences.")
     (let* ((username (user:username (auth:current)))
            (prefs (dm:get-one 'plaster-users (db:query (:= 'user username)))))
 
