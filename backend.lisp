@@ -6,41 +6,48 @@
 
 (in-package #:plaster)
 
-(admin:define-panel general plaster (:lquery (template "plaster/admin-general.html") :menu-icon "fa-file-text" :menu-tooltip "General plaster settings")
-  (cond
-    ((string= (server:post "action") "Submit")
-     (setf (config-tree :plaster :anon) (not (null (server:post "anon")))
-           (config-tree :plaster :captcha) (not (null (server:post "captcha")))
-           (config-tree :plaster :maxpastes) (parse-integer (server:post "maxpastes"))
-           (config-tree :plaster :cooldown) (parse-integer (server:post "cooldown"))))
-    ((string= (server:post "action") "Add")
-     (let ((table (cond ((string= (server:post "form") "types") "plaster-types")
-                        ((string= (server:post "form") "themes") "plaster-themes"))))
-       (db:insert table `(("title" . ,(server:post "title"))
-                          ("name" . ,(server:post "name"))
-                          ("mime" . ,(server:post "mime"))))))
-    ((string= (server:post "action") "Delete")
-     (let ((table (cond ((string= (server:post "form") "types") "plaster-types")
-                        ((string= (server:post "form") "themes") "plaster-themes"))))
-       (dolist (id (or (server:post "selected[]") (list (server:post "id"))))
-         (db:remove table (db:query (:= "_id" id)))))))
-  
-  ($ "input[name=\"anon\"]" (attr :checked (if (config-tree :plaster :anon) "checked")))
-  ($ "input[name=\"captcha\"]" (attr :checked (if (config-tree :plaster :captcha) "checked")))
-  ($ "input[name=\"maxpastes\"]" (val (or (config-tree :plaster :maxpastes) "-1")))
-  ($ "input[name=\"cooldown\"]" (val (or (config-tree :plaster :cooldown) "0")))
-
-  (uibox:fill-foreach (dm:get "plaster-types" :all :sort '(("title" . :ASC))) "#types tbody tr")
-  (uibox:fill-foreach (dm:get "plaster-themes" :all :sort '(("title" . :ASC))) "#themes tbody tr"))
-
-(profile:define-panel preferences plaster (:lquery (template "plaster/user-preferences.html") :menu-icon "" :menu-tooltip "")
-  (let* ((username (user:field (user:current) "username"))
-         (prefs (dm:get-one "plaster-user" (db:query (:= "user" username)))))
-    (when (server:get "notice")
-      (uibox:notice (server:get "notice")))
+(define-implement-hook admin
+  (admin:define-panel general plaster (:lquery (template "admin-general.ctml") :icon "fa-file-text" :tooltip "General plaster settings")
+    (cond
+      ((string= (post-var "action") "Submit")
+       (setf (config-tree :plaster :anon) (not (null (post-var "anon")))
+             (config-tree :plaster :captcha) (not (null (post-var "captcha")))
+             (config-tree :plaster :maxpastes) (parse-integer (post-var "maxpastes"))
+             (config-tree :plaster :cooldown) (parse-integer (post-var "cooldown"))))
+      ((string= (post-var "action") "Add")
+       (cond ((string= (post-var "form") "types")
+              (db:insert 'plaster-types
+                         `(("title" . ,(post-var "title"))
+                           ("name" . ,(post-var "name"))
+                           ("mime" . ,(post-var "mime")))))
+             ((string= (post-var "form") "themes")
+              (db:insert 'plaster-themes
+                         `(("title" . ,(post-var "title"))
+                           ("name" . ,(post-var "name")))))))
+      ((string= (post-var "action") "Delete")
+       (let ((table (cond ((string= (post-var "form") "types") "plaster-types")
+                          ((string= (post-var "form") "themes") "plaster-themes"))))
+         (dolist (id (or (post-var "selected[]") (list (post-var "id"))))
+           (db:remove table (db:query (:= "_id" id)))))))
     
-    (uibox:fill-foreach (dm:get "plaster-themes" :all :sort '(("title" . :ASC))) "#theme option")
-    (uibox:fill-foreach (dm:get "plaster-types" :all :sort '(("title" . :ASC))) "#type option")
+    ($ "input[name=\"anon\"]" (attr :checked (if (config-tree :plaster :anon) "checked")))
+    ($ "input[name=\"captcha\"]" (attr :checked (if (config-tree :plaster :captcha) "checked")))
+    ($ "input[name=\"maxpastes\"]" (val (or (config-tree :plaster :maxpastes) "-1")))
+    ($ "input[name=\"cooldown\"]" (val (or (config-tree :plaster :cooldown) "0")))
 
-    ($ (inline (format NIL "#theme option[value=\"~a\"]" (if prefs (dm:field prefs "theme") "default"))) (attr :selected "selected"))
-    ($ (inline (format NIL "#type option[value=\"~a\"]" (if prefs (dm:field prefs "default-type") "text"))) (attr :selected "selected"))))
+    (r-clip:process
+     T
+     :themes (dm:get 'plaster-themes (db:query :all))
+     :types (dm:get 'plaster-types (db:query :all))))
+
+  (admin:define-panel preferences plaster (:lquery (template "admin-preferences.ctml") :icon "" :tooltip "")
+    (let* ((username (user:username (auth:current)))
+           (prefs (dm:get-one 'plaster-users (db:query (:= "user" username)))))
+
+      (r-clip:process
+       T
+       :themes (dm:get 'plaster-themes (db:query :all))
+       :types (dm:get 'plaster-types (db:query :all)))
+      
+      ($ (inline (format NIL "#theme option[value=\"~a\"]" (if prefs (dm:field prefs "theme") "default"))) (attr :selected "selected"))
+      ($ (inline (format NIL "#type option[value=\"~a\"]" (if prefs (dm:field prefs "default-type") "text"))) (attr :selected "selected")))))

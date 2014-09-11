@@ -13,7 +13,7 @@
 
   <h2>Paste Types</h2>
   <div class="tablebox">
-    <table class="selectable extendable actions tablesorter" id="types">
+    <table class="selectable extendable actions interactive" id="types">
       <thead>
         <tr>
 	  <th><input type="checkbox" class="select-all" /></th>
@@ -24,17 +24,19 @@
         </tr>
       </thead>
       <tbody>
-        <tr>
-	  <td><input type="checkbox" name="selected[]" form="massEditForm" data-uibox="value:_id" /></td>
-	  <td><input type="text" style="width:100%" readonly="readonly" data-uibox="value:title" /></td>
-	  <td><input type="text" style="width:100%" readonly="readonly" data-uibox="value:name" /></td>
-	  <td><input type="text" style="width:100%" readonly="readonly" data-uibox="value:mime" /></td>
-	  <td><form action="#types" method="post">
+        <c:splice iterate="types">
+          <tr>
+	    <td><input type="checkbox" name="selected[]" form="massEditForm" lquery="(val _id)" /></td>
+	    <td><input type="text" style="width:100%" readonly="readonly" lquery="(val title)" /></td>
+	    <td><input type="text" style="width:100%" readonly="readonly" lquery="(val name)" /></td>
+	    <td><input type="text" style="width:100%" readonly="readonly" lquery="(val mime)" /></td>
+	    <td><form action="#types" method="post">
               <input type="hidden" name="form" value="types" />
-	      <input type="hidden" name="id" data-uibox="value:_id" />
+	      <input type="hidden" name="id" lquery="(val _id)" />
 	      <input type="submit" name="action" value="Delete" />
-	  </form></td>
-        </tr>
+	    </form></td>
+          </tr>
+        </c:splice>
         <tr class="tableExtensionRow">
           <td></td>
 	  <td><input type="text" name="title" form="typesTableExtensionForm" placeholder="Title" required="required" style="width:100%" autofocus="autofocus" /></td>
@@ -55,7 +57,7 @@
 
   <h2>Editor Themes</h2>
   <div class="tablebox">
-    <table class="selectable extendable actions tablesorter" id="themes">
+    <table class="selectable extendable actions interactive" id="themes">
       <thead>
         <tr>
 	  <th><input type="checkbox" class="select-all" /></th>
@@ -65,16 +67,18 @@
         </tr>
       </thead>
       <tbody>
-        <tr>
-	  <td><input type="checkbox" name="selected[]" form="massEditForm" data-uibox="value:_id" /></td>
-	  <td><input type="text" style="width:100%" readonly="readonly" data-uibox="value:title" /></td>
-	  <td><input type="text" style="width:100%" readonly="readonly" data-uibox="value:name" /></td>
-	  <td><form action="#themes" method="post">
+        <c:splice iterate="themes">
+          <tr>
+	    <td><input type="checkbox" name="selected[]" form="massEditForm" lquery="(val _id)" /></td>
+	    <td><input type="text" style="width:100%" readonly="readonly" lquery="(val title)" /></td>
+	    <td><input type="text" style="width:100%" readonly="readonly" lquery="(val name)" /></td>
+	    <td><form action="#themes" method="post">
               <input type="hidden" name="form" value="themes" />
-	      <input type="hidden" name="id" data-uibox="value:_id" />
+	      <input type="hidden" name="id" lquery="(val _id)" />
 	      <input type="submit" name="action" value="Delete" />
-	  </form></td>
-        </tr>
+	    </form></td>
+          </tr>
+        </c:splice>
         <tr class="tableExtensionRow">
           <td></td>
 	  <td><input type="text" name="title" form="themesTableExtensionForm" placeholder="Title" required="required" style="width:100%" autofocus="autofocus" /></td>

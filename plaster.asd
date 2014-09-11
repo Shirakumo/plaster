@@ -22,7 +22,6 @@
   :depends-on ((:interface :database)
                (:interface :data-model)
                (:interface :user)
-               (:interface :profile)
                (:interface :auth)
                :r-clip
                :alexandria
