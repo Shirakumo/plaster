@@ -7,7 +7,7 @@
 (in-package #:plaster)
 
 (define-implement-hook admin
-  (admin:define-panel general plaster (:lquery (template "admin-general.ctml") :icon "fa-file-text" :tooltip "General plaster settings")
+  (admin:define-panel general plaster (:access '(plaster admin) :lquery (template "admin-general.ctml") :icon "fa-file-text" :tooltip "General plaster settings")
     (cond
       ((string= (post-var "action") "Submit")
        (setf (config-tree :plaster :anon) (not (null (post-var "anon")))
@@ -40,7 +40,7 @@
      :themes (dm:get 'plaster-themes (db:query :all))
      :types (dm:get 'plaster-types (db:query :all))))
 
-  (admin:define-panel preferences plaster (:lquery (template "admin-preferences.ctml") :icon "fa-wrench" :tooltip "Set your default editor preferences.")
+  (admin:define-panel preferences plaster (:access () :lquery (template "admin-preferences.ctml") :icon "fa-wrench" :tooltip "Set your default editor preferences.")
     (let* ((username (user:username (auth:current)))
            (prefs (dm:get-one 'plaster-users (db:query (:= 'user username)))))
 
