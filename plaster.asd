@@ -23,6 +23,7 @@
                (:interface :data-model)
                (:interface :user)
                (:interface :auth)
+               (:interface :profile)
                :r-clip
                :alexandria
                :crypto-shortcuts
