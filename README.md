@@ -26,3 +26,8 @@ Whether anonymous pasting is allowed or not. Defaults to T.
 Whether to use a captcha for anonymous pastes. Defaults to T.
 * `(:plaster :encrypt-salt)`  
 The salt to use for encrypting pastes. Defaults to a random string.
+
+Permissions
+-----------
+* `(plaster admin)`
+* `(plaster preferences)`
