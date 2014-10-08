@@ -10,9 +10,9 @@
   :defsystem-depends-on (:radiance) 
   :author "Nicolas Hafner"
   :description "A pasting service for Radiance."
-  :version "0.0.1" 
+  :version "0.9.1" 
   :license "Artistic" 
-  :homepage "http://github.com/Shinmera/radiance-plaster"
+  :homepage "http://github.com/Shinmera/plaster"
   :components ((:file "module")
                (:file "toolkit")
                (:file "api")
