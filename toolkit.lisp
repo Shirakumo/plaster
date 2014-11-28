@@ -97,7 +97,7 @@
                 ;; View permissions cascade from parent, so check it.
                 (or (= (dm:field paste "pid") -1)
                     (paste-accessible-p (dm:get-one 'plaster (db:query (:= '_id (dm:field paste "pid")))) user)))
-           (and user (user:check user "plaster.admin")))))
+           (and user (user:check user (perm plaster admin))))))
 
 (defparameter *captcha-salt* (make-random-string))
 (defparameter *captchas* '("divisible" "determined" "questionable" "difficult" "simplistic" "always" "never" "however" "occasionally" "certainly"
@@ -115,7 +115,7 @@
      (cryptos:pbkdf2-hash el *captcha-salt*))))
 
 (defun paste-editable-p (paste user)
-  (and user (or (user:check user "plaster.admin")
+  (and user (or (user:check user (perm plaster admin))
                 (string-equal (dm:field paste "author") (user:username user)))))
 
 (defmacro assert-api (&body forms)
