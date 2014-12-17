@@ -6,13 +6,13 @@
 
 (in-package #:plaster)
 
-(define-page plaster-index #@"plaster/^$" ()
+(define-page plaster-index #@"plaster/" ()
   (redirect "/new"))
 
-(define-page plaster-list #@"plaster/^recent" (:lquery (template "list.ctml"))
+(define-page plaster-list #@"plaster/recent" (:lquery (template "list.ctml"))
   (r-clip:process ($ (node)) :pastes (dm:get 'plaster (db:query (:and (:= 'view 0) (:= 'pid -1))) :sort '((time :DESC)) :amount *public-pastes-limit*)))
 
-(define-page plaster-user #@"plaster/^user/([^/]*)(/([0-9]+))?" (:uri-groups (username NIL page) :lquery (template "user.ctml"))
+(define-page plaster-user #@"plaster/user/([^/]*)(/([0-9]+))?" (:uri-groups (username NIL page) :lquery (template "user.ctml"))
   (let ((user (auth:current))
         (viewuser (user:get username))
         (page (or (parse-integer (or page "") :junk-allowed T) 1)))
@@ -28,7 +28,7 @@
                  (dm:get 'plaster (db:query (:and (:!= 'pid -1) (:= 'view 0) (:= 'author username)))
                          :sort '((time :DESC)) :amount *user-pastes-per-page* :skip (* *user-pastes-per-page* (1- page)))))))
 
-(define-page plaster-view #@"plaster/^view(/([0-9a-zA-Z]*))?" (:uri-groups (NIL id) :lquery (template "view.ctml"))
+(define-page plaster-view #@"plaster/view(/([0-9a-zA-Z]*))?" (:uri-groups (NIL id) :lquery (template "view.ctml"))
   (let* ((user (auth:current))
          (paste (dm:get-one 'plaster (db:query (:and (:= '_id (hash->id (or id (get-var "id")))) (:= 'pid -1)))))
          (err NIL))
@@ -59,7 +59,7 @@
                              (setf (dm:field model "editable") (paste-editable-p model user))))
                        (dm:get 'plaster (db:query (:= 'pid (dm:id paste))) :sort '((time :ASC))))))))
 
-(define-page plaster-new #@"plaster/^new" (:lquery (template "new.ctml"))
+(define-page plaster-new #@"plaster/new" (:lquery (template "new.ctml"))
   (let* ((user (auth:current))
          (annotate (when-let ((annotate-id (get-var "annotate")))
                      (dm:get-one 'plaster (db:query (:and (:= '_id (hash->id annotate-id)) (:= 'pid -1))))))
@@ -111,7 +111,7 @@
       ($ "#annotateid" (attr :value (id->hash (dm:field annotate "_id")))))
     ($ (inline (format NIL "#typeselect option[value=\"~a\"]" (or type "text/plain"))) (attr :selected "selected"))))
 
-(define-page plaster-edit #@"plaster/^edit(/([0-9a-zA-Z]*))?" (:uri-groups (NIL id) :lquery (template "edit.ctml"))
+(define-page plaster-edit #@"plaster/edit(/([0-9a-zA-Z]*))?" (:uri-groups (NIL id) :lquery (template "edit.ctml"))
   (let* ((user (or (auth:current) (user:get :anonymous)))
          (paste (dm:get-one 'plaster (db:query (:= '_id (hash->id (or id (post/get "id")))))))
          (err))
