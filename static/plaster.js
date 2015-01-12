@@ -99,7 +99,7 @@ $(function(){
         }
         $(editor).data("mode", null);
 
-        $(".editorresize", editor).dbclick();
+        $(".editorresize", editor).dblclick();
 
         initializeResize();
     }
