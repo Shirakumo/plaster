@@ -99,6 +99,8 @@ $(function(){
         }
         $(editor).data("mode", null);
 
+        $(".editorresize", editor).dbclick();
+
         initializeResize();
     }
 
