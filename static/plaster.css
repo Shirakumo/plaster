@@ -107,7 +107,7 @@ header nav ul::after{
     clear: both;
     position: relative;
     margin-bottom: 20px;
-    height: 150px;
+    height: 500px;
 }
 
 #maineditor.edit .editor{
