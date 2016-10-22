@@ -84,7 +84,7 @@
                                          password (post-var "captcha") (post-var "hash") "true")
                   (radiance-error (err) (message err))))))
     (if accessible
-        (if (or (config-tree :plaster :anon) user)
+        (if (or (config :anon) user)
             (progn
               ($ ".code" (text text))
               ($ "#title" (val title))

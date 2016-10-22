@@ -55,8 +55,8 @@
         (type (string-or "text" type))
         (view (parse-integer (string-or "0" view)))
         (client (string-equal client "true"))
-        (maxpastes (config-tree :plaster :maxpastes))
-        (cooldown (config-tree :plaster :cooldown))
+        (maxpastes (config :maxpastes))
+        (cooldown (config :cooldown))
         (last-time (let ((set (db:select 'plaster (db:query (:= 'ip (remote *request*)))
                                          :amount 1 :sort '((time :DESC)) :fields '(time))))
                      (when set (gethash "time" (first set))))))
@@ -69,7 +69,7 @@
        "View must be between 0 and 3.")
       ((<= (length title) 64)
        "Title must be less than 65 characters long.")
-      ((or user (config-tree :plaster :anon))
+      ((or user (config :anon))
        "Anonymous pasting is not permitted.")
       ((or (not (= 2 view)) user)
        "Anonymous users cannot create private pastes.")
@@ -80,7 +80,7 @@
       ((or (not cooldown) (not last-time) (< cooldown (- (get-unix-time) last-time)))
        (format NIL "Please wait ~d seconds between pastes." cooldown)))
 
-    (when (and (not user) (config-tree :plaster :captcha))
+    (when (and (not user) (config :captcha))
       (assert-api
         ((< 0 (length hash))
          "Captcha hash is missing.")
@@ -224,15 +224,15 @@
   (if service
       (api-output
        (alexandria:plist-hash-table
-        (list service (not (null (config-tree :plaster :import (find-symbol (string-upcase service) :KEYWORD)))))))
+        (list service (not (null (config :import (find-symbol (string-upcase service) :KEYWORD)))))))
       (api-output
-       (mapcar #'car (config-tree :plaster :import)))))
+       (mapcar #'car (config :import)))))
 
 ;; (define-api plaster/user/import/pastebin (username password &optional (client "false")) ()
 ;;   "Import pastes from pastebin."
 ;;   (flet ((request (where &rest params)
 ;;            (apply #'drakma:http-request where :external-format-in :utf-8 :external-format-out :utf-8 params)))
-;;     (let ((apikey (config-tree :plaster :import :pastebin :apikey))
+;;     (let ((apikey (config :import :pastebin :apikey))
 ;;           (user (user:field (user:current) "username")))
 ;;       (assert-api (:apicall "user/import/pastebin" :module "plaster" :code 400 :text)
 ;;         ((not (null apikey))

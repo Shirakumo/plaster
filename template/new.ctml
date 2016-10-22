@@ -47,7 +47,7 @@
         </div>
         <div class="editor">
           <ul class="editorbar buttonbar">
-            <c:when test="(and (not user) (config-tree :plaster :captcha))">
+            <c:when test="(and (not user) (mconfig :plaster :captcha))">
               <li id="captcha">
                 <label>Finish the word: </label>
                 <input type="hidden" name="hash" value="HASH" lquery="(val captcha-hash)" />

@@ -66,7 +66,7 @@
   (cl-ppcre:regex-replace-all (format NIL "~C~C" #\return #\linefeed) string (string #\linefeed)))
 
 (defun encrypt (text password)
-  (let ((salt (or (config-tree :plaster :encrypt-salt) *default-salt*)))
+  (let ((salt (defaulted-config *default-salt* :encrypt-salt)))
     (when (< (length text) 16)
       (setf text (concatenate 'string text (make-string (- 16 (length text)) :initial-element #\Space))))
     (concatenate
@@ -76,7 +76,7 @@
 
 (defun decrypt (text password)
   (destructuring-bind (hash text) (cl-ppcre:split "-" text)
-    (let* ((salt (or (config-tree :plaster :encrypt-salt) *default-salt*))
+    (let* ((salt (defaulted-config *default-salt* :encrypt-salt))
            (decrypted (cryptos:decrypt text (cryptos:pbkdf2-key password salt :digest :sha256 :iterations 1)))
            (hashed (cryptos:simple-hash decrypted salt :iterations 1 :digest 'ironclad:md5)))
       (when (string-equal hashed hash)

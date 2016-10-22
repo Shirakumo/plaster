@@ -12,10 +12,10 @@
   (admin:define-panel general plaster (:access (perm plaster admin) :lquery (template "admin-general.ctml") :icon "fa-file-text" :tooltip "General plaster settings")
     (cond
       ((string= (post-var "action") "Submit")
-       (setf (config-tree :plaster :anon) (not (null (post-var "anon")))
-             (config-tree :plaster :captcha) (not (null (post-var "captcha")))
-             (config-tree :plaster :maxpastes) (parse-integer (post-var "maxpastes"))
-             (config-tree :plaster :cooldown) (parse-integer (post-var "cooldown"))))
+       (setf (config :anon) (not (null (post-var "anon")))
+             (config :captcha) (not (null (post-var "captcha")))
+             (config :maxpastes) (parse-integer (post-var "maxpastes"))
+             (config :cooldown) (parse-integer (post-var "cooldown"))))
       ((string= (post-var "action") "Add")
        (cond ((string= (post-var "form") "types")
               (db:insert 'plaster-types
@@ -32,10 +32,10 @@
          (dolist (id (or (post-var "selected[]") (list (post-var "id"))))
            (db:remove table (db:query (:= '_id id)))))))
     
-    ($ "input[name=\"anon\"]" (attr :checked (if (config-tree :plaster :anon) "checked")))
-    ($ "input[name=\"captcha\"]" (attr :checked (if (config-tree :plaster :captcha) "checked")))
-    ($ "input[name=\"maxpastes\"]" (val (or (config-tree :plaster :maxpastes) "-1")))
-    ($ "input[name=\"cooldown\"]" (val (or (config-tree :plaster :cooldown) "0")))
+    ($ "input[name=\"anon\"]" (attr :checked (if (config :anon) "checked")))
+    ($ "input[name=\"captcha\"]" (attr :checked (if (config :captcha) "checked")))
+    ($ "input[name=\"maxpastes\"]" (val (or (config :maxpastes) "-1")))
+    ($ "input[name=\"cooldown\"]" (val (or (config :cooldown) "0")))
 
     (r-clip:process
      T

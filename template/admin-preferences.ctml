@@ -16,9 +16,9 @@
     </div>
   </form>
 
-  <c:when test="(config-tree :plaster :import)">
+  <c:when test="(mconfig :plaster :import)">
     <h2>Import Pastes</h2>
-    <c:when test="(config-tree :plaster :import :pastebin)">
+    <c:when test="(mconfig :plaster :import :pastebin)">
       <form method="post" action="/api/plaster/user/import/pastebin" class="box" id="import-pastebin" autocomplete="off">
         <h3>Pastebin</h3>
         <label>Username:</label><input type="text" name="username" /><br />
