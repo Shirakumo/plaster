@@ -90,7 +90,7 @@
                     (and (post/get "password")
                          (< 0 (length (post/get "password")))
                          ;; We've come this far, decrypt it and set it so we don't have to do it twice.
-                         (setf (field paste "text")
+                         (setf (dm:field paste "text")
                                (decrypt (dm:field paste "text") (post/get "password")))))
                 (or (not (= (dm:field paste "view") 2))
                     (and user (string-equal (user:username user) (dm:field paste "author"))))
