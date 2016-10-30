@@ -7,4 +7,5 @@
 (in-package #:modularize-user)
 (define-module #:plaster
   (:shadowing-import-from #:radiance #:make-keyword)
-  (:use #:cl #:radiance #:lquery #:alexandria))
+  (:use #:cl #:radiance #:lquery #:alexandria)
+  (:shadow #:format-time))
