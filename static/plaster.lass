@@ -1,0 +1,12 @@
+(body
+ :font-family sans-serif
+ :font-size 12pt
+ :background "#000"
+ :margin 0
+ (header
+  :color "#FFF"
+  :background "#151515"
+  (nav
+   (a :background "#0088EE")))
+ (main
+  :background "#EEE"))
