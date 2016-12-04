@@ -13,15 +13,14 @@
       </nav>
     </header>
     <main>
-      <form class="edit" method="post" action="#" @action="/api/plaster/new">
+      <form class="edit">
         <header>
-          <input type="text" name="title" placeholder="Untitled" maxlength="32" />
+          <input type="text" name="title" placeholder="Untitled" maxlength="32" readonly
+                 lquery="(val title)" />
         </header>
-        <textarea name="text" placeholder="Paste something here" autofocus></textarea>
-        <nav class="actions">
-          <input type="hidden" name="browser" value="true" />
-          <input type="submit" name="action" value="Post" />
-        </nav>
+        <textarea name="text" placeholder="Paste something here" readonly
+                  lquery="(text text)"></textarea>
+        <nav class="actions"></nav>
       </form>
     </main>
     <footer>

@@ -1,14 +1,46 @@
 (body
  :font-family sans-serif
- :font-size 12pt
- :background "#000"
+ :font-size 14pt
+ :background (rgb 0 0 0)
  :margin 0
- (header
-  :color "#FFF"
-  :background "#151515"
-  :border-bottom 2px solid "#0088EE"
-  (h1 :margin 0)
-  (nav
-   (a :background "#0088EE")))
- (main
-  :background "#EEE"))
+ ((:or a input[type=submit])
+  :text-decoration none
+  :background (rgb 0 130 240)
+  :color (rgb 255 255 255)
+  :padding 2px 5px 2px 5px
+  :border none
+  :font-size 1.0em
+  :font-weight bold)
+ ((:and (:or a input[type=submit]) ":hover")
+  :background (rgb 255 255 255)
+  :color (rgb 0 0 0)
+  :cursor pointer)
+ (>header
+  :color (rgb 255 255 255)
+  (h1 :margin 0 20px 0 20px
+      :font-size 2em
+      :display inline)
+  (nav :display inline-flex))
+ (>main
+  (.edit
+   :text-align right
+   (header
+    :text-align left
+    :padding 10px
+    :background (rgb 20 20 20)
+    :border-bottom 3px solid (rgb 0 130 240)
+    (input[type=text]
+     :font-size 1.0em
+     :width 400px
+     :background (rgb 50 50 50)
+     :color (rgb 255 255 255)
+     :border none
+     :padding 5px))
+   (textarea
+    :width 100%
+    :padding 5px
+    :min-height 200px
+    :box-sizing border-box
+    :display block
+    :font-family monospace
+    :font-size 1.0em))))
