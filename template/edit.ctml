@@ -13,16 +13,26 @@
       </nav>
     </header>
     <main>
-      <form class="edit" method="post" action="#" @action="/api/plaster/new">
-        <header>
-          <input type="text" name="title" placeholder="Untitled" maxlength="32" />
-        </header>
-        <textarea name="text" placeholder="Paste something here" autofocus></textarea>
-        <nav class="actions">
-          <input type="hidden" name="browser" value="true" />
-          <input type="submit" name="action" value="Post" />
-        </nav>
-      </form>
+      <c:using value="paste">
+        <form class="edit" method="post" action="#">
+          <header>
+            <input type="text" name="title" placeholder="Untitled" maxlength="32" />
+          </header>
+          <textarea name="text" placeholder="Paste something here" autofocus></textarea>
+          <nav class="actions">
+            <input type="hidden" name="id" lquery="(val _id)" />
+            <input type="hidden" name="browser" value="true" />
+            <c:if test="(dm:hull-p *)">
+              <c:then>
+                <input type="submit" @formaction="/api/plaster/new" value="Post" />
+              </c:then>
+              <c:else>
+                <input type="submit" @formaction="/api/plaster/edit" value="Edit" />
+              </c:else>
+            </c:if>
+          </nav>
+        </form>
+      </c:using>
     </main>
     <footer>
     </footer>
