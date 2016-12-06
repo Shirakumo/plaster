@@ -13,12 +13,15 @@
       </nav>
     </header>
     <main>
+      <c:when test="error">
+        <div id="error" lquery="(text error)">ERROR</div>
+      </c:when>
       <c:using value="paste">
         <form class="edit" method="post" action="#">
           <header>
-            <input type="text" name="title" placeholder="Untitled" maxlength="32" />
+            <input type="text" name="title" placeholder="Untitled" maxlength="32" lquery="(val title)" />
           </header>
-          <textarea name="text" placeholder="Paste something here" autofocus></textarea>
+          <textarea name="text" placeholder="Paste something here" autofocus lquery="(text text)"></textarea>
           <nav class="actions">
             <input type="hidden" name="id" lquery="(val _id)" />
             <input type="hidden" name="browser" value="true" />

@@ -23,14 +23,26 @@
   (let ((paste (if id
                    (ensure-paste id)
                    (dm:hull 'plaster-pastes))))
-    (r-clip:process T :paste paste)))
+    (r-clip:process T :paste paste
+                      :error (get-var "error"))))
 
 (define-page view "plaster/view/(.*)" (:uri-groups (id) :lquery "view.ctml")
   (r-clip:process T :paste (ensure-paste id)))
 
+(defun api-paste-output (paste)
+  (if (string= "true" (post/get "browser"))
+      (redirect (make-uri :domains '("plaster")
+                          :path (format NIL "view/~a" (dm:id paste))))
+      (api-output (loop for field in (dm:fields paste)
+                        collect (cons field (dm:field paste field))))))
+
 (define-api plaster/new (text &optional title) ()
   (let ((paste (create-paste text :title title)))
-    (if (string= "true" (post/get "browser"))
-        (redirect (make-uri :domains '("plaster")
-                            :path (format NIL "view/~a" id)))
-        (api-output `(("id" . ,(dm:id paste)))))))
+    (api-paste-output paste)))
+
+(define-api plaster/edit (id &optional text title) ()
+  (let ((paste (ensure-paste id)))
+    (when text (setf (dm:field paste "text") text))
+    (when title (setf (dm:field paste "title") title))
+    (dm:save paste)
+    (api-paste-output paste)))

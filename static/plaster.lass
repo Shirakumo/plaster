@@ -21,6 +21,12 @@
       :font-size 2em
       :display inline)
   (nav :display inline-flex))
+ ("#error"
+  :background (rgb 200 0 0)
+  :color (rgb 255 255 255)
+  :padding 10px
+  :margin 10px
+  :font-weight bold)
  (>main
   (.edit
    :text-align right
@@ -29,6 +35,7 @@
     :padding 10px
     :background (rgb 20 20 20)
     :border-bottom 3px solid (rgb 0 130 240)
+    :color (rgb 255 255 255)
     (input[type=text]
      :font-size 1.0em
      :width 400px
@@ -43,4 +50,9 @@
     :box-sizing border-box
     :display block
     :font-family monospace
-    :font-size 1.0em))))
+    :font-size 1.0em)
+   (.actions
+    :display flex
+    :justify-content flex-end
+    ((:or a input)
+     :display inline-block)))))
