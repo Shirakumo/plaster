@@ -21,12 +21,14 @@
       :font-size 2em
       :display inline)
   (nav :display inline-flex))
- ("#error"
-  :background (rgb 200 0 0)
+ (.infobox
+  :background (rgb 100 100 100)
   :color (rgb 255 255 255)
   :padding 10px
   :margin 10px
   :font-weight bold)
+ ("#error" :background (rgb 200 0 0))
+ ("#message" :background (rgb 0 200 0))
  (>main
   (.edit
    :text-align right

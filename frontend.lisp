@@ -24,7 +24,8 @@
                    (ensure-paste id)
                    (dm:hull 'plaster-pastes))))
     (r-clip:process T :paste paste
-                      :error (get-var "error"))))
+                      :error (get-var "error")
+                      :message (get-var "message"))))
 
 (define-page view "plaster/view/(.*)" (:uri-groups (id) :lquery "view.ctml")
   (r-clip:process T :paste (ensure-paste id)))
@@ -46,3 +47,12 @@
     (when title (setf (dm:field paste "title") title))
     (dm:save paste)
     (api-paste-output paste)))
+
+(define-api plaster/delete (id) ()
+  (let ((paste (ensure-paste id)))
+    (dm:delete paste)
+    (if (string= "true" (post/get "browser"))
+        (redirect (uri-to-url "plaster/edit"
+                              :representation :external
+                              :query '(("message" . "Paste deleted"))))
+        (api-output `(("_id" . ,(dm:id paste)))))))

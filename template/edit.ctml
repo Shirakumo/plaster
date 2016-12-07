@@ -14,7 +14,10 @@
     </header>
     <main>
       <c:when test="error">
-        <div id="error" lquery="(text error)">ERROR</div>
+        <div class="infobox" id="error" lquery="(text error)">ERROR</div>
+      </c:when>
+      <c:when test="message">
+        <div class="infobox" id="message" lquery="(text message)">MESSAGE</div>
       </c:when>
       <c:using value="paste">
         <form class="edit" method="post" action="#">
@@ -30,7 +33,8 @@
                 <input type="submit" @formaction="/api/plaster/new" value="Post" />
               </c:then>
               <c:else>
-                <input type="submit" @formaction="/api/plaster/edit" value="Edit" />
+                <input type="submit" @formaction="/api/plaster/delete" value="Delete" />
+                <input type="submit" @formaction="/api/plaster/edit" value="Save" />
               </c:else>
             </c:if>
           </nav>
