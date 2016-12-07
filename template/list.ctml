@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Plaster</title>
+    <link rel="stylesheet" type="text/css" href="../static/plaster.css" @href="/static/plaster/plaster.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Plaster</h1>
+      <nav>
+        <a href="#" @href="plaster/edit">New</a>
+      </nav>
+    </header>
+    <main>
+      <ul class="public paste-listing" iterate="pastes">
+        <li>
+          <a href="#" @href="plaster/view/{0} _id">
+            <span class="id" lquery="(text _id)">ID</span>
+            <span class="title" lquery="(text title)">TITLE</span>
+            <time lquery="(time time)" />
+          </a>
+        </li>
+      </ul>
+    </main>
+  </body>
+</html>
