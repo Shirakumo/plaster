@@ -23,10 +23,34 @@
           <textarea name="text" placeholder="Paste something here" readonly
                     lquery="(text text)"></textarea>
           <nav class="actions">
+            <a href="#" @href="plaster/edit?annotate={0} _id">Annotate</a>
+            <a href="#" @href="plaster/edit/{0}?repaste _id">Repaste</a>
             <a href="#" @href="plaster/edit/{0} _id">Edit</a>
           </nav>
         </form>
       </c:using>
+      <c:when test="annotations">
+        <section id="annotations">
+          <h2>Annotations</h2>
+          <ul iterate="annotations">
+            <li>
+              <form class="edit" lquery="(attr :id _id)">
+                <header>
+                  <input type="text" name="title" placeholder="Untitled" maxlength="32" readonly
+                         lquery="(val title)" />
+                  <time lquery="(time time)">2106.10.23</time>
+                </header>
+                <textarea name="text" placeholder="Paste something here" readonly
+                          lquery="(text text)"></textarea>
+                <nav class="actions">
+                  <a href="#" @href="plaster/edit/{0}?repaste _id">Repaste</a>
+                  <a href="#" @href="plaster/edit/{0} _id">Edit</a>
+                </nav>
+              </form>
+            </li>
+          </ul>
+        </section>
+      </c:when>
     </main>
     <footer>
     </footer>

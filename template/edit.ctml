@@ -28,7 +28,8 @@
           <nav class="actions">
             <input type="hidden" name="id" lquery="(val _id)" />
             <input type="hidden" name="browser" value="true" />
-            <c:if test="(dm:hull-p *)">
+            <input type="hidden" name="parent" lquery="(val (** :parent))" />
+            <c:if test="(or (** :repaste) (dm:hull-p *))">
               <c:then>
                 <input type="submit" @formaction="/api/plaster/new" value="Post" />
               </c:then>

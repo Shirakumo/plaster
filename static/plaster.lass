@@ -31,7 +31,6 @@
  ("#message" :background (rgb 0 200 0))
  (>main
   (.edit
-   :text-align right
    (header
     :text-align left
     :padding 10px
@@ -57,4 +56,20 @@
     :display flex
     :justify-content flex-end
     ((:or a input)
-     :display inline-block)))))
+     :display inline-block)))
+  ("#annotations"
+   :margin 0 10px 0 10px
+   (h2
+    :color (rgb 255 255 255)
+    :border-bottom 3px solid (rgb 0 130 240))
+   (ul
+    :list-style none
+    :padding 0
+    (.edit
+     :margin 0 0 5px 0
+     (header
+      :padding 5px
+      :font-size 0.8em
+      :border-width 1px)
+     (textarea
+      :min-height 100px))))))
