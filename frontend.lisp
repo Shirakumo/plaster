@@ -79,6 +79,18 @@
                             #'< :key (lambda (a) (dm:field a "time")))))
     (r-clip:process T :paste paste :annotations annotations)))
 
+(defparameter *pastes-per-page* 25)
+
+(define-page list "plaster/list(/(.*))?" (:uri-groups (NIL page) :lquery "list.ctml")
+  (let* ((page (or (when page (parse-integer page :junk-allowed T)) 0))
+         (pastes (dm:get 'plaster-pastes (db:query :all)
+                         :sort '((time :DESC))
+                         :skip (* page *pastes-per-page*)
+                         :amount *pastes-per-page*)))
+    (r-clip:process T :pastes pastes
+                      :page page
+                      :has-more (<= *pastes-per-page* (length pastes)))))
+
 (define-api plaster/new (text &optional title parent) ()
   (let ((paste (create-paste text :title title :parent parent)))
     (api-paste-output paste)))

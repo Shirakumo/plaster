@@ -13,15 +13,26 @@
       </nav>
     </header>
     <main>
-      <ul class="public paste-listing" iterate="pastes">
-        <li>
-          <a href="#" @href="plaster/view/{0} _id">
-            <span class="id" lquery="(text _id)">ID</span>
-            <span class="title" lquery="(text title)">TITLE</span>
-            <time lquery="(time time)" />
-          </a>
-        </li>
-      </ul>
+      <section class="paste-list public">
+        <header>
+          <h2>Public Paste List</h2>
+        </header>
+        <c:when test="(< 0 page)">
+          <a class="button newer" href="#" @href="plaster/list/{0} (1- page)">Newer</a>
+        </c:when>
+        <ul iterate="pastes">
+          <li>
+            <a href="#" @href="plaster/view/{0} _id">
+              <span class="id" lquery="(text _id)">ID</span>
+              <span class="title" lquery="(text title)">TITLE</span>
+              <time lquery="(time time)" />
+            </a>
+          </li>
+        </ul>
+        <c:when test="has-more">
+          <a class="button older" href="#" @href="plaster/list/{0} (1+ page)">Older</a>
+        </c:when>
+      </section>
     </main>
   </body>
 </html>
