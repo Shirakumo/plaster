@@ -20,7 +20,10 @@
   (h1 :margin 0 20px 0 20px
       :font-size 2em
       :display inline)
-  (nav :display inline-flex))
+  (nav :display inline-flex
+       :vertical-align bottom
+       (a :margin 0 10px 0 0
+          :background (rgb 20 20 20))))
  (.infobox
   :background (rgb 100 100 100)
   :color (rgb 255 255 255)
@@ -31,18 +34,23 @@
  ("#message" :background (rgb 0 200 0))
  (>main
   (header
-    :padding 10px
-    :background (rgb 20 20 20)
-    :border-bottom 3px solid (rgb 0 130 240)
+   :align-items center
+   :display flex
+   :flex-wrap wrap
+   :padding 10px
+   :background (rgb 20 20 20)
+   :border-bottom 3px solid (rgb 0 130 240)
+   :color (rgb 255 255 255)
+   (h2 :margin 0)
+   ((:or select input)
+    :font-size 1.0em
+    :background (rgb 50 50 50)
     :color (rgb 255 255 255)
-    (h2 :margin 0)
-    (input[type=text]
-     :font-size 1.0em
-     :width 400px
-     :background (rgb 50 50 50)
-     :color (rgb 255 255 255)
-     :border none
-     :padding 5px))
+    :border none
+    :padding 5px)
+   ([name=title] :width 400px)
+   (.visibility :font-size 0.8em
+                :padding-left 5px))
   (.edit
    (textarea
     :width 100%

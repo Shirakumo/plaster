@@ -24,6 +24,14 @@
         <form class="edit" method="post" action="#">
           <header>
             <input type="text" name="title" placeholder="Untitled" maxlength="32" lquery="(val title)" />
+            <div class="visibility">
+              Visibility: <select name="visibility">
+              <option value="1" lquery="(attr :selected (eql 1 visibility))">public</option>
+              <option value="2" lquery="(attr :selected (eql 2 visibility))">unlisted</option>
+              <option value="3" lquery="(attr :selected (eql 3 visibility))">private</option>
+              </select>
+              <input type="password" name="password" placeholder="password" />
+            </div>
           </header>
           <textarea name="text" placeholder="Paste something here" autofocus required lquery="(text text)"></textarea>
           <nav class="actions">
