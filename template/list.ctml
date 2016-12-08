@@ -10,6 +10,7 @@
       <h1>Plaster</h1>
       <nav>
         <a href="#" @href="plaster/edit">New</a>
+        <a href="#" @href="plaster/list">List</a>
       </nav>
     </header>
     <main>
