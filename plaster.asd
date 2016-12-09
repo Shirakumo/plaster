@@ -6,5 +6,6 @@
                (:file "frontend"))
   :depends-on ((:interface :database)
                (:interface :data-model)
+               (:interface :user)
                :r-clip
                :crypto-shortcuts))

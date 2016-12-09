@@ -6,6 +6,7 @@
 (define-trigger db:connected ()
   (db:create 'plaster-pastes '((title (:varchar 32))
                                (time (:integer 5))
+                               (author (:varchar 32))
                                (visibility (:integer 1))
                                (password (:varchar 128))
                                (text :text)))
@@ -56,7 +57,7 @@
              `(("paste" . ,(dm:id (ensure-paste paste)))
                ("annotation" . ,(dm:id (ensure-paste annotation))))))
 
-(defun create-paste (text &key title parent visibility password)
+(defun create-paste (text &key title parent visibility password author)
   (when (and parent visibility)
     (api-error "Cannot set the visibility of an annotation."))
   (db:with-transaction ()
@@ -67,6 +68,7 @@
       (setf (dm:field paste "text") text
             (dm:field paste "title") (or title "")
             (dm:field paste "time") (get-universal-time)
+            (dm:field paste "author") author
             (dm:field paste "visibility") visibility
             (dm:field paste "password") password)
       (dm:insert paste)
