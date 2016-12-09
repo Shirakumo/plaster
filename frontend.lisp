@@ -57,10 +57,12 @@
                ("annotation" . ,(dm:id (ensure-paste annotation))))))
 
 (defun create-paste (text &key title parent visibility password)
+  (when (and parent visibility)
+    (api-error "Cannot set the visibility of an annotation."))
   (db:with-transaction ()
     (let* ((paste (dm:hull 'plaster-pastes))
            (parent (when parent (ensure-paste parent)))
-           (visibility (ensure-visibility visibility))
+           (visibility (if parent 2 (ensure-visibility visibility)))
            (password (ensure-password visibility password)))
       (setf (dm:field paste "text") text
             (dm:field paste "title") (or title "")
@@ -80,50 +82,79 @@
       paste)))
 
 (defun edit-paste (paste &key text title visibility password)
-  (let* ((paste (ensure-paste paste)))
-    (when text
-      (setf (dm:field paste "text") text))
-    (when title
-      (setf (dm:field paste "title") title))
-    (when visibility
-      (setf (dm:field paste "visibility") (ensure-visibility visibility)))
-    (when password
-      (setf (dm:field paste "password") (ensure-password (or visibility (dm:field paste "visibility"))
-                                                         password)))
-    (dm:save paste)))
+  (db:with-transaction ()
+    (let* ((paste (ensure-paste paste)))
+      (when text
+        (setf (dm:field paste "text") text))
+      (when title
+        (setf (dm:field paste "title") title))
+      (when (and (paste-parent paste) visibility)
+        (api-error "Cannot set the visibility of an annotation."))
+      (when visibility
+        (setf (dm:field paste "visibility") (ensure-visibility visibility)))
+      (when password
+        (setf (dm:field paste "password") (ensure-password (or visibility (dm:field paste "visibility"))
+                                                           password)))
+      (dm:save paste))))
+
+(defun paste-url (paste &optional (parent (paste-parent paste)))
+  (let ((paste (ensure-paste paste)))
+    (make-url :domains '("plaster")
+              :path (format NIL "view/~a"
+                            (if parent
+                                (dm:id parent)
+                                (dm:id paste)))
+              :fragment (princ-to-string (dm:id paste)))))
 
 (defun api-paste-output (paste)
   (cond ((string= "true" (post/get "browser"))
-         (let ((parent (paste-parent paste)))
-           (redirect (make-url :domains '("plaster")
-                               :path (format NIL "view/~a"
-                                             (if parent
-                                                 (dm:id parent)
-                                                 (dm:id paste)))
-                               :fragment (princ-to-string (dm:id paste))))))
+         (redirect (paste-url paste)))
         (T
          (api-output (loop for field in (dm:fields paste)
                            collect (cons field (dm:field paste field)))))))
 
+(defun call-with-password-protection (function paste &optional (password (post/get "password")))
+  (cond ((or (not (eql 3 (dm:field paste "visibility")))
+             (string= (dm:field paste "password") (cryptos:pbkdf2-hash password *password-salt*)))
+         (funcall function))
+        ((or* password)
+         (error 'request-denied :message "The supplied password is incorrect."))
+        (T
+         (r-clip:process (@template "password.ctml")))))
+
+(defmacro with-password-protection ((paste &optional (password '(post/get "password"))) &body body)
+  `(call-with-password-protection
+    (lambda () ,@body) ,paste ,password))
+
 (define-page edit "plaster/edit(/(.*))?" (:uri-groups (NIL id) :lquery "edit.ctml")
-  (let ((paste (if id
-                   (ensure-paste id)
-                   (dm:hull 'plaster-pastes))))
-    (r-clip:process T :paste paste
-                      :parent (get-var "annotate")
-                      :repaste (get-var "repaste")
-                      :error (get-var "error")
-                      :message (get-var "message"))))
+  (let* ((paste (if id
+                    (ensure-paste id)
+                    (dm:hull 'plaster-pastes)))
+         (parent (if id
+                     (paste-parent paste)
+                     (when (get-var "annotate") (ensure-paste (get-var "annotate"))))))
+    (with-password-protection ((or parent paste))
+      (r-clip:process T :paste paste
+                        :password (post/get "password")
+                        :parent (when parent (dm:id parent))
+                        :repaste (get-var "repaste")
+                        :error (get-var "error")
+                        :message (get-var "message")))))
 
 (define-page view "plaster/view/(.*)" (:uri-groups (id) :lquery "view.ctml")
   (let* ((paste (ensure-paste id))
-         (annotations (sort (paste-annotations paste)
-                            #'< :key (lambda (a) (dm:field a "time")))))
-    (r-clip:process T :paste paste :annotations annotations)))
+         (parent (paste-parent paste)))
+    (if parent
+        (redirect (paste-url paste parent))
+        (with-password-protection (paste)
+          (r-clip:process T :paste paste
+                            :password (post/get "password")
+                            :annotations (sort (paste-annotations paste)
+                                               #'< :key (lambda (a) (dm:field a "time"))))))))
 
 (define-page list "plaster/list(/(.*))?" (:uri-groups (NIL page) :lquery "list.ctml")
   (let* ((page (or (when page (parse-integer page :junk-allowed T)) 0))
-         (pastes (dm:get 'plaster-pastes (db:query :all)
+         (pastes (dm:get 'plaster-pastes (db:query (:= 'visibility 1))
                          :sort '((time :DESC))
                          :skip (* page *pastes-per-page*)
                          :amount *pastes-per-page*)))
@@ -131,16 +162,29 @@
                       :page page
                       :has-more (<= *pastes-per-page* (length pastes)))))
 
-(define-api plaster/new (text &optional title parent visibility password) ()
+(defun check-password (paste password)
+  (let ((paste (ensure-paste paste))
+        (parent (paste-parent paste)))
+    (when parent (setf paste parent))
+    (when (and (= 3 (dm:field paste "visibility"))
+               (string/= (cryptos:pbkdf2-hash password *password-salt*)
+                         (dm:field (ensure-paste paste) "password")))
+      (api-error "Invalid password for paste ~a" (dm:id paste)))))
+
+(define-api plaster/new (text &optional title parent visibility password current-password) ()
+  (when parent (check-password parent current-password))
   (let ((paste (create-paste text :title title :parent parent :visibility visibility :password password)))
     (api-paste-output paste)))
 
-(define-api plaster/edit (id &optional text title visibility password) ()
-  (let ((paste (edit-paste id :text text :title title :visibility visibility :password password)))
+(define-api plaster/edit (id &optional text title visibility password current-password) ()
+  (let ((paste (ensure-paste id)))
+    (check-password paste current-password)
+    (edit-paste id :text text :title title :visibility visibility :password password)
     (api-paste-output paste)))
 
-(define-api plaster/delete (id) ()
+(define-api plaster/delete (id &optional current-password) ()
   (let ((paste (ensure-paste id)))
+    (check-password paste current-password)
     (dm:delete paste)
     (if (string= "true" (post/get "browser"))
         (redirect (uri-to-url "plaster/edit"

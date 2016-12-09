@@ -24,20 +24,30 @@
         <form class="edit" method="post" action="#">
           <header>
             <input type="text" name="title" placeholder="Untitled" maxlength="32" lquery="(val title)" />
-            <div class="visibility">
-              Visibility: <select name="visibility">
-              <option value="1" lquery="(attr :selected (eql 1 visibility))">public</option>
-              <option value="2" lquery="(attr :selected (eql 2 visibility))">unlisted</option>
-              <option value="3" lquery="(attr :selected (eql 3 visibility))">private</option>
-              </select>
-              <input type="password" name="password" placeholder="password" />
-            </div>
+            <c:if test="(** :parent)">
+              <c:then>
+                <div class="annotate">
+                  Annotating paste <span lquery="(text (** :parent))">#</span>
+                </div>
+              </c:then>
+              <c:else>
+                <div class="visibility">
+                  Visibility: <select name="visibility">
+                  <option value="1" lquery="(attr :selected (eql 1 visibility))">public</option>
+                  <option value="2" lquery="(attr :selected (eql 2 visibility))">unlisted</option>
+                  <option value="3" lquery="(attr :selected (eql 3 visibility))">private</option>
+                  </select>
+                  <input type="password" name="password" placeholder="password" lquery="(val (** :password))" />
+                </div>
+              </c:else>
+            </c:if>
           </header>
           <textarea name="text" placeholder="Paste something here" autofocus required lquery="(text text)"></textarea>
           <nav class="actions">
             <input type="hidden" name="id" lquery="(val _id)" />
             <input type="hidden" name="browser" value="true" />
             <input type="hidden" name="parent" lquery="(val (** :parent))" />
+            <input type="hidden" name="current-password" lquery="(val (** :password))" />
             <c:if test="(or (** :repaste) (dm:hull-p *))">
               <c:then>
                 <input type="submit" @formaction="/api/plaster/new" value="Post" />

@@ -83,6 +83,14 @@
       :min-height 100px))))
   (.button
    :display block)
+  (.password-prompt
+   :background (rgb 255 255 255)
+   :text-align center
+   (input[type=password]
+    :margin 10px
+    :font-size 1.0em
+    :background (rgb 230 230 230)
+    :border 1px solid (rgb 200 200 200)))
   (.paste-list   
    (ul
     :background (rgb 255 255 255)
