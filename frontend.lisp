@@ -77,8 +77,10 @@
   (db:with-transaction ()
     (let ((paste (ensure-paste paste)))
       (mapc #'dm:delete (paste-annotations paste))
-      (db:remove 'plaster-annotations (db:query (:= 'paste (dm:id paste))))
-      (db:remove 'plaster-annotations (db:query (:= 'annotation (dm:id paste))))
+      (db:remove 'plaster-annotations
+                 (db:query (:or (:= 'paste (dm:id paste))
+                                (:= 'annotation (dm:id paste)))))
+      (dm:delete paste)
       paste)))
 
 (defun edit-paste (paste &key text title visibility password)
@@ -185,7 +187,7 @@
 (define-api plaster/delete (id &optional current-password) ()
   (let ((paste (ensure-paste id)))
     (check-password paste current-password)
-    (dm:delete paste)
+    (delete-paste paste)
     (if (string= "true" (post/get "browser"))
         (redirect (uri-to-url "plaster/edit"
                               :representation :external
