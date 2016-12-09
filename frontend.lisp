@@ -137,6 +137,9 @@
          (parent (if id
                      (paste-parent paste)
                      (when (get-var "annotate") (ensure-paste (get-var "annotate"))))))
+    (if id
+        (check-permission NIL 'new)
+        (check-permission paste 'edit))
     (with-password-protection ((or parent paste))
       (r-clip:process T :paste paste
                         :password (post/get "password")
@@ -148,6 +151,7 @@
 (define-page view "plaster/view/(.*)" (:uri-groups (id) :lquery "view.ctml")
   (let* ((paste (ensure-paste id))
          (parent (paste-parent paste)))
+    (check-permission paste 'view)
     (if parent
         (redirect (paste-url paste parent))
         (with-password-protection (paste)
@@ -157,6 +161,7 @@
                                                #'< :key (lambda (a) (dm:field a "time"))))))))
 
 (define-page list "plaster/list(/(.*))?" (:uri-groups (NIL page) :lquery "list.ctml")
+  (check-permission NIL 'list)
   (let* ((page (or (when page (parse-integer page :junk-allowed T)) 0))
          (pastes (dm:get 'plaster-pastes (db:query (:= 'visibility 1))
                          :sort '((time :DESC))
@@ -175,19 +180,34 @@
                          (dm:field (ensure-paste paste) "password")))
       (api-error "Invalid password for paste ~a" (dm:id paste)))))
 
+(defun check-permission (paste action &optional (user (or (auth:current) (user:get "anonymous"))))
+  (unless (or (and paste
+                   (string= (dm:field paste "author") (user:username user))
+                   (user:check user `(plaster paste ,action own)))
+              (user:check user `(plaster paste ,action)))
+    (error 'request-denied :message (format NIL "You do not have the permission to ~a pastes."
+                                            action))))
+
 (define-api plaster/new (text &optional title parent visibility password current-password) ()
+  (check-permission NIL 'new)
   (when parent (check-password parent current-password))
-  (let ((paste (create-paste text :title title :parent parent :visibility visibility :password password)))
+  (let ((paste (create-paste text :title title
+                                  :parent parent
+                                  :visibility visibility
+                                  :password password
+                                  :author (user:username (or (auth:current) (user:get "anonymous"))))))
     (api-paste-output paste)))
 
 (define-api plaster/edit (id &optional text title visibility password current-password) ()
   (let ((paste (ensure-paste id)))
+    (check-permission paste 'edit)
     (check-password paste current-password)
     (edit-paste id :text text :title title :visibility visibility :password password)
     (api-paste-output paste)))
 
 (define-api plaster/delete (id &optional current-password) ()
   (let ((paste (ensure-paste id)))
+    (check-permission paste 'delete)
     (check-password paste current-password)
     (delete-paste paste)
     (if (string= "true" (post/get "browser"))
@@ -195,3 +215,10 @@
                               :representation :external
                               :query '(("message" . "Paste deleted"))))
         (api-output `(("_id" . ,(dm:id paste)))))))
+
+(user:add-default-permissions
+ (perm plaser paste new)
+ (perm plaser paste view)
+ (perm plaser paste list)
+ (perm plaser paste edit own)
+ (perm plaser paste delete own))

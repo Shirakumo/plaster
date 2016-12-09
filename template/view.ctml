@@ -19,6 +19,7 @@
           <header>
             <input type="text" name="title" placeholder="Untitled" maxlength="32" readonly
                    lquery="(val title)" />
+            <a rel="author" lquery="(text author)">AUTHOR</a>
             <time lquery="(time time)">2106.10.23</time>
           </header>
           <textarea name="text" placeholder="Paste something here" readonly
@@ -39,6 +40,7 @@
                 <header>
                   <input type="text" name="title" placeholder="Untitled" maxlength="32" readonly
                          lquery="(val title)" />
+                  <a rel="author" lquery="(text author)">AUTHOR</a>
                   <time lquery="(time time)">2106.10.23</time>
                 </header>
                 <textarea name="text" placeholder="Paste something here" readonly

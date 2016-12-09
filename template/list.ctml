@@ -26,6 +26,7 @@
             <a href="#" @href="plaster/view/{0} _id">
               <span class="id" lquery="(text _id)">ID</span>
               <span class="title" lquery="(text title)">TITLE</span>
+              <a rel="author" lquery="(text author)">AUTHOR</a>
               <time lquery="(time time)" />
             </a>
           </li>

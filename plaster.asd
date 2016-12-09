@@ -7,5 +7,6 @@
   :depends-on ((:interface :database)
                (:interface :data-model)
                (:interface :user)
+               (:interface :auth)
                :r-clip
                :crypto-shortcuts))
