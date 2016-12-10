@@ -1,6 +1,8 @@
 (in-package #:plaster)
 
 (defparameter *pastes-per-page* 25)
+(defparameter *default-api-amount* 50)
+(defparameter *maximum-api-amount* 100)
 (defparameter *password-salt* "Something ˢᵉᶜʳᵉᵗ")
 
 (define-trigger db:connected ()
@@ -126,12 +128,43 @@
                                 (dm:id paste)))
               :fragment (princ-to-string (dm:id paste)))))
 
+(defun check-password (paste password)
+  (let ((paste (ensure-paste paste))
+        (parent (paste-parent paste)))
+    (when parent (setf paste parent))
+    (when (and (= 3 (dm:field paste "visibility"))
+               (string/= (cryptos:pbkdf2-hash password *password-salt*)
+                         (dm:field (ensure-paste paste) "password")))
+      (api-error "Invalid password for paste ~a" (dm:id paste)))))
+
+(defun permitted (action &optional paste (user (or (auth:current) (user:get "anonymous"))))
+  (if (listp action)
+      (loop for a in action thereis (permitted a paste user))
+      (or (and paste
+               (equal (dm:field paste "author") (user:username user))
+               (user:check user `(plaster paste ,action own)))
+          (user:check user `(plaster paste ,action)))))
+
+(defun check-permission (action &optional paste (user (or (auth:current) (user:get "anonymous"))))
+  (unless (permitted action paste user)
+    (error 'request-denied :message (format NIL "You do not have the permission to ~a pastes."
+                                            action))))
+
+(defun reformat-paste (paste &key include-annotations)
+  (let ((table (make-hash-table :test 'eql)))
+    (flet ((copy (field)
+             (setf (gethash field table) (dm:field paste field))))
+      (mapcar #'copy '("title" "time" "author" "visibility" "text")))
+    (when include-annotations
+      (setf (gethash "annotations" table)
+            (mapcar #'reformat-paste (paste-annotations paste))))
+    table))
+
 (defun api-paste-output (paste)
   (cond ((string= "true" (post/get "browser"))
          (redirect (paste-url paste)))
         (T
-         (api-output (loop for field in (dm:fields paste)
-                           collect (cons field (dm:field paste field)))))))
+         (api-output (reformat-paste paste)))))
 
 (defun call-with-password-protection (function paste &optional (password (post/get "password")))
   (cond ((or (not (eql 3 (dm:field paste "visibility")))
@@ -219,27 +252,32 @@
                         :amount *pastes-per-page*)))
     (r-clip:process T :pastes pastes)))
 
-(defun check-password (paste password)
-  (let ((paste (ensure-paste paste))
-        (parent (paste-parent paste)))
-    (when parent (setf paste parent))
-    (when (and (= 3 (dm:field paste "visibility"))
-               (string/= (cryptos:pbkdf2-hash password *password-salt*)
-                         (dm:field (ensure-paste paste) "password")))
-      (api-error "Invalid password for paste ~a" (dm:id paste)))))
+(define-api plaster/view (id &optional current-password include-annotations) ()
+  (let ((paste (ensure-paste id)))
+    (check-permission 'view paste)
+    (with-password-protection (paste current-password)
+      (api-output (reformat-paste paste :include-annotations (or* include-annotations))))))
 
-(defun permitted (action &optional paste (user (or (auth:current) (user:get "anonymous"))))
-  (if (listp action)
-      (loop for a in action thereis (permitted a paste user))
-      (or (and paste
-               (equal (dm:field paste "author") (user:username user))
-               (user:check user `(plaster paste ,action own)))
-          (user:check user `(plaster paste ,action)))))
-
-(defun check-permission (action &optional paste (user (or (auth:current) (user:get "anonymous"))))
-  (unless (permitted action paste user)
-    (error 'request-denied :message (format NIL "You do not have the permission to ~a pastes."
-                                            action))))
+(define-api plaster/list (&optional author skip amount include-annotations) ()
+  (check-permission 'list)
+  (let ((amount (if amount (parse-integer amount) *default-api-amount*))
+        (skip (if skip (parse-integer skip) 0)))
+    (unless (<= 0 amount *maximum-api-amount*)
+      (error 'api-argument-invalid :argument "amount"
+                                   :message (format NIL "Amount must be within [0,~a]" amount)))
+    (let ((query (cond ((and (auth:current) (equalp author (user:username (auth:current))))
+                        (db:query (:= 'author author)))
+                       (author
+                        (db:query (:and (:= 'visibility 1)
+                                        (:= 'author author))))
+                       (T
+                        (db:query (:= 'visibility 1))))))
+      (api-output
+       (loop for paste in (dm:get 'plaster-pastes query
+                                  :sort '((time :DESC))
+                                  :amount amount
+                                  :skip skip)
+             collect (reformat-paste paste :include-annotations include-annotations))))))
 
 (define-api plaster/new (text &optional title parent visibility password current-password) ()
   (check-permission 'new)
