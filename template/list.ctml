@@ -9,8 +9,12 @@
     <header>
       <h1>Plaster</h1>
       <nav>
-        <a href="#" @href="plaster/edit">New</a>
-        <a href="#" @href="plaster/list">List</a>
+        <c:when test="(plaster::permitted :new)">
+          <a href="#" @href="plaster/edit">New</a>
+        </c:when>
+        <c:when test="(plaster::permitted :list)">
+          <a href="#" @href="plaster/list">List</a>
+        </c:when>
       </nav>
     </header>
     <main>

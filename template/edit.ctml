@@ -9,8 +9,12 @@
     <header>
       <h1>Plaster</h1>
       <nav>
-        <a href="#" @href="plaster/edit">New</a>
-        <a href="#" @href="plaster/list">List</a>
+        <c:when test="(plaster::permitted :new)">
+          <a href="#" @href="plaster/edit">New</a>
+        </c:when>
+        <c:when test="(plaster::permitted :list)">
+          <a href="#" @href="plaster/list">List</a>
+        </c:when>
       </nav>
     </header>
     <main>
@@ -53,8 +57,12 @@
                 <input type="submit" @formaction="/api/plaster/new" value="Post" />
               </c:then>
               <c:else>
-                <input type="submit" @formaction="/api/plaster/delete" value="Delete" />
-                <input type="submit" @formaction="/api/plaster/edit" value="Save" />
+                <c:when test="(plaster::permitted :delete *)">
+                  <input type="submit" @formaction="/api/plaster/delete" value="Delete" />
+                </c:when>
+                <c:when test="(plaster::permitted :edit *)">
+                  <input type="submit" @formaction="/api/plaster/edit" value="Save" />
+                </c:when>
               </c:else>
             </c:if>
           </nav>
