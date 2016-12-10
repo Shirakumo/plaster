@@ -26,25 +26,25 @@
       </nav>
     </header>
     <main>
-      <section class="paste-list public">
+      <section class="paste-list user">
         <header>
-          <h2>Public Paste List</h2>
+          <img alt="Avatar" src="#" lquery="(attr :src (profile:avatar user 100))" />
+          <h2><a href="#" @href="<profile page {0}> user" lquery="(text username)">USERNAME</a>'s Pastes</h2>
         </header>
         <c:when test="(< 0 page)">
-          <a class="button newer" href="#" @href="plaster/list/{0} (1- page)">Newer</a>
+          <a class="button newer" href="#" @href="plaster/user/{0}/{1} username (1- page)">Newer</a>
         </c:when>
         <ul iterate="pastes">
           <li>
             <a href="#" @href="plaster/view/{0} _id">
               <span class="id" lquery="(text _id)">ID</span>
               <span class="title" lquery="(text title)">TITLE</span>
-              <a rel="author" lquery="(text author)" @href="plaster/user/{0} author">AUTHOR</a>
               <time lquery="(time time)" />
             </a>
           </li>
         </ul>
         <c:when test="has-more">
-          <a class="button older" href="#" @href="plaster/list/{0} (1+ page)">Older</a>
+          <a class="button older" href="#" @href="plaster/user/{0}/{1} username (1+ page)">Older</a>
         </c:when>
       </section>
     </main>

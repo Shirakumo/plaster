@@ -15,6 +15,14 @@
         <c:when test="(plaster::permitted :list)">
           <a href="#" @href="plaster/list">List</a>
         </c:when>
+        <c:if test="(auth:current)">
+          <c:then><c:when test="(plaster::permitted :user)">
+            <a href="#" @href="plaster/user/{0} (user:username (auth:current))">My Pastes</a>
+          </c:when></c:then>
+          <c:else>
+            <a href="#" @href="<auth page login #>">Login</a>
+          </c:else>
+        </c:if>
       </nav>
     </header>
     <main>

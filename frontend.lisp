@@ -15,17 +15,19 @@
 
 (define-trigger user:ready ()
   (user:add-default-permissions
-   (perm plaser paste new)
-   (perm plaser paste view)
-   (perm plaser paste list)
-   (perm plaser paste edit own)
-   (perm plaser paste delete own))
+   (perm plaster paste new)
+   (perm plaster paste view)
+   (perm plaster paste list)
+   (perm plaster paste user)
+   (perm plaster paste edit own)
+   (perm plaster paste delete own))
 
   (user:grant
    "anonymous"
    (perm plaster paste new)
    (perm plaster paste view)
-   (perm plaster paste list)))
+   (perm plaster paste list)
+   (perm plaster paste user)))
 
 (defun ensure-paste (paste-ish)
   (etypecase paste-ish
@@ -184,6 +186,38 @@
     (r-clip:process T :pastes pastes
                       :page page
                       :has-more (<= *pastes-per-page* (length pastes)))))
+
+(define-page user "plaster/user/(.*)(/(.*))?" (:uri-groups (username NIL page) :lquery "user.ctml")
+  (check-permission 'user)
+  (let* ((page (or (when page (parse-integer page :junk-allowed T)) 0))
+         (user (user:get username)))
+    (unless user
+      (error 'request-not-found :message (format NIL "No such user ~s." username)))
+    (let ((pastes (dm:get 'plaster-pastes
+                          (if (and (auth:current) (or (eql (auth:current) user)
+                                                      (user:check (auth:current) '(perm plaster))))
+                              (db:query (:= 'author username))
+                              (db:query (:and (:= 'author username)
+                                              (:= 'visibility 1))))
+                          :sort '((time :DESC))
+                          :skip (* page *pastes-per-page*)
+                          :amount *pastes-per-page*)))
+      (r-clip:process T :pastes pastes
+                        :user user
+                        :username (user:username user)
+                        :page page
+                        :has-more (<= *pastes-per-page* (length pastes))))))
+
+(profile:define-panel pastes (:user user :lquery "user-panel.ctml")
+  (let ((pastes (dm:get 'plaster-pastes
+                        (if (and (auth:current) (or (eql (auth:current) user)
+                                                    (user:check (auth:current) '(perm plaster))))
+                            (db:query (:= 'author (user:username user)))
+                            (db:query (:and (:= 'author (user:username user))
+                                            (:= 'visibility 1))))
+                        :sort '((time :DESC))
+                        :amount *pastes-per-page*)))
+    (r-clip:process T :pastes pastes)))
 
 (defun check-password (paste password)
   (let ((paste (ensure-paste paste))

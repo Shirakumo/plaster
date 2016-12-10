@@ -1,0 +1,15 @@
+(.paste-list   
+ (ul
+  :list-style none
+  :padding 0
+  :margin 0
+  (li (a :background none
+         :display flex
+         :align-items center
+         :color (rgb 0 0 0)
+         :font-weight normal
+         :text-decoration none
+         (.id :min-width 50px)
+         (.title :flex-grow 1))
+      ("a:hover"
+       :background (rgb 220 220 220)))))

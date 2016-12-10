@@ -8,5 +8,6 @@
                (:interface :data-model)
                (:interface :user)
                (:interface :auth)
+               (:interface :profile)
                :r-clip
                :crypto-shortcuts))

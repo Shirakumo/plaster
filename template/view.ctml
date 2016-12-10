@@ -15,6 +15,14 @@
         <c:when test="(plaster::permitted :list)">
           <a href="#" @href="plaster/list">List</a>
         </c:when>
+        <c:if test="(auth:current)">
+          <c:then><c:when test="(plaster::permitted :user)">
+            <a href="#" @href="plaster/user/{0} (user:username (auth:current))">My Pastes</a>
+          </c:when></c:then>
+          <c:else>
+            <a href="#" @href="<auth page login #>">Login</a>
+          </c:else>
+        </c:if>
       </nav>
     </header>
     <main>
@@ -23,7 +31,7 @@
           <header>
             <input type="text" name="title" placeholder="Untitled" maxlength="32" readonly
                    lquery="(val title)" />
-            <a rel="author" lquery="(text author)">AUTHOR</a>
+            <a rel="author" lquery="(text author)" @href="plaster/user/{0} author">AUTHOR</a>
             <time lquery="(time time)">2106.10.23</time>
           </header>
           <textarea name="text" placeholder="Paste something here" readonly
@@ -48,7 +56,7 @@
                 <header>
                   <input type="text" name="title" placeholder="Untitled" maxlength="32" readonly
                          lquery="(val title)" />
-                  <a rel="author" lquery="(text author)">AUTHOR</a>
+                  <a rel="author" lquery="(text author)" @href="plaster/user/{0} author">AUTHOR</a>
                   <time lquery="(time time)">2106.10.23</time>
                 </header>
                 <textarea name="text" placeholder="Paste something here" readonly

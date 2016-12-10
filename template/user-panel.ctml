@@ -1,0 +1,13 @@
+<link rel="stylesheet" type="text/css" href="../static/panel.css" @href="/static/plaster/panel.css" />
+<section class="paste-list panel">
+  <h2>Recent Pastes</h2>
+  <ul iterate="pastes">
+    <li>
+      <a href="#" @href="plaster/view/{0} _id">
+        <span class="id" lquery="(text _id)">ID</span>
+        <span class="title" lquery="(text title)">TITLE</span>
+        <time lquery="(time time)" />
+      </a>
+    </li>
+  </ul>
+</section>
