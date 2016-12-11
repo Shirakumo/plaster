@@ -1,9 +1,5 @@
 (in-package #:plaster)
 
-(defparameter *pastes-per-page* 25)
-(defparameter *default-api-amount* 50)
-(defparameter *maximum-api-amount* 100)
-(defparameter *password-salt* "Something ˢᵉᶜʳᵉᵗ")
 (defparameter *paste-types*
   (list* "text"
          (sort (mapcar #'pathname-name
@@ -22,20 +18,29 @@
                                     (annotation :id))))
 
 (define-trigger user:ready ()
-  (user:add-default-permissions
-   (perm plaster paste new)
-   (perm plaster paste view)
-   (perm plaster paste list)
-   (perm plaster paste user)
-   (perm plaster paste edit own)
-   (perm plaster paste delete own))
+  (defaulted-config 25 :pastes-per-page)
+  (defaulted-config 50 :api :default-amount)
+  (defaulted-config 100 :api :maximum-amount)
+  (defaulted-config (make-random-string) :password-salt)
 
-  (user:grant
-   "anonymous"
-   (perm plaster paste new)
-   (perm plaster paste view)
-   (perm plaster paste list)
-   (perm plaster paste user)))
+  (defaulted-config (list
+                     (perm plaster paste new)
+                     (perm plaster paste view)
+                     (perm plaster paste list)
+                     (perm plaster paste user)
+                     (perm plaster paste edit own)
+                     (perm plaster paste delete own))
+                    :permissions :default)
+
+  (defaulted-config (list
+                     (perm plaster paste new)
+                     (perm plaster paste view)
+                     (perm plaster paste list)
+                     (perm plaster paste user))
+                    :permissions :anonymous)
+
+  (apply #'user:add-default-permissions (config :permissions :default))
+  (apply #'user:grant "anonymous" (config :permissions :anonymous)))
 
 (defun ensure-paste (paste-ish)
   (etypecase paste-ish
@@ -72,7 +77,7 @@
       (api-error "A password is required for private visibility."))
     (when (and (/= visibility 3) password)
       (api-error "Cannot set a password on public or unlisted visibility.")))
-  (when password (cryptos:pbkdf2-hash password *password-salt*)))
+  (when password (cryptos:pbkdf2-hash password (config :password-salt))))
 
 (defun ensure-paste-type (type)
   (let ((type (string-downcase (or type "text"))))
@@ -149,7 +154,7 @@
         (parent (paste-parent paste)))
     (when parent (setf paste parent))
     (when (and (= 3 (dm:field paste "visibility"))
-               (string/= (cryptos:pbkdf2-hash password *password-salt*)
+               (string/= (cryptos:pbkdf2-hash password (config :password-salt))
                          (dm:field (ensure-paste paste) "password")))
       (api-error "Invalid password for paste ~a" (dm:id paste)))))
 
@@ -184,7 +189,7 @@
 
 (defun call-with-password-protection (function paste &optional (password (post/get "password")))
   (cond ((or (not (eql 3 (dm:field paste "visibility")))
-             (string= (dm:field paste "password") (cryptos:pbkdf2-hash password *password-salt*)))
+             (string= (dm:field paste "password") (cryptos:pbkdf2-hash password (config :password-salt))))
          (funcall function))
         ((or* password)
          (error 'request-denied :message "The supplied password is incorrect."))
@@ -231,11 +236,11 @@
   (let* ((page (or (when page (parse-integer page :junk-allowed T)) 0))
          (pastes (dm:get 'plaster-pastes (db:query (:= 'visibility 1))
                          :sort '((time :DESC))
-                         :skip (* page *pastes-per-page*)
-                         :amount *pastes-per-page*)))
+                         :skip (* page (config :pastes-per-page))
+                         :amount (config :pastes-per-page))))
     (r-clip:process T :pastes pastes
                       :page page
-                      :has-more (<= *pastes-per-page* (length pastes)))))
+                      :has-more (<= (config :pastes-per-page) (length pastes)))))
 
 (define-page user "plaster/user/(.*)(/(.*))?" (:uri-groups (username NIL page) :lquery "user.ctml")
   (check-permission 'user)
@@ -250,13 +255,13 @@
                               (db:query (:and (:= 'author username)
                                               (:= 'visibility 1))))
                           :sort '((time :DESC))
-                          :skip (* page *pastes-per-page*)
-                          :amount *pastes-per-page*)))
+                          :skip (* page (config :pastes-per-page))
+                          :amount (config :pastes-per-page))))
       (r-clip:process T :pastes pastes
                         :user user
                         :username (user:username user)
                         :page page
-                        :has-more (<= *pastes-per-page* (length pastes))))))
+                        :has-more (<= (config :pastes-per-page) (length pastes))))))
 
 (profile:define-panel pastes (:user user :lquery "user-panel.ctml")
   (let ((pastes (dm:get 'plaster-pastes
@@ -266,7 +271,7 @@
                             (db:query (:and (:= 'author (user:username user))
                                             (:= 'visibility 1))))
                         :sort '((time :DESC))
-                        :amount *pastes-per-page*)))
+                        :amount (config :pastes-per-page))))
     (r-clip:process T :pastes pastes)))
 
 (define-api plaster/view (id &optional current-password include-annotations) ()
@@ -277,9 +282,9 @@
 
 (define-api plaster/list (&optional author skip amount include-annotations) ()
   (check-permission 'list)
-  (let ((amount (if amount (parse-integer amount) *default-api-amount*))
+  (let ((amount (if amount (parse-integer amount) (config :api :default-amount)))
         (skip (if skip (parse-integer skip) 0)))
-    (unless (<= 0 amount *maximum-api-amount*)
+    (unless (<= 0 amount (config :api :maximum-amount))
       (error 'api-argument-invalid :argument "amount"
                                    :message (format NIL "Amount must be within [0,~a]" amount)))
     (let ((query (cond ((and (auth:current) (equalp author (user:username (auth:current))))
