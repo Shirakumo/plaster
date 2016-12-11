@@ -72,6 +72,7 @@ var Plaster = function(){
         element.mirror = null;
         self.maybeLoadTheme(config.theme, function(){
             self.maybeLoadMode(config.mode, function(){
+                textarea.removeAttribute("required");
                 element.mirror = CodeMirror.fromTextArea(textarea, config);
                 if(callback) callback(element);
             });
