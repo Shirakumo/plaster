@@ -41,6 +41,7 @@
                     lquery="(text text)"></textarea>
           <nav class="actions">
             <c:when test="(plaster::permitted :new)">
+              <a href="#" @href="plaster/view/{0}/raw?password={1} _id (** :password)">Raw</a>
               <a href="#" @href="plaster/edit?annotate={0}&password={1} _id (** :password)">Annotate</a>
               <a href="#" @href="plaster/edit/{0}?repaste&password={1} _id (** :password)">Repaste</a>
             </c:when>
@@ -66,6 +67,7 @@
                 <textarea name="text" placeholder="Paste something here" readonly
                           lquery="(text text)"></textarea>
                 <nav class="actions">
+                  <a href="#" @href="plaster/view/{0}/raw?password={1} _id (** :password)">Raw</a>
                   <c:when test="(plaster::permitted :new)">
                     <a href="#" @href="plaster/edit/{0}?repaste&password={1} _id (** :password)">Repaste</a>
                   </c:when>

@@ -231,6 +231,12 @@
                             :annotations (sort (paste-annotations paste)
                                                #'< :key (lambda (a) (dm:field a "time"))))))))
 
+(define-page raw "plaster/view/(.*)/raw" (:uri-groups (id))
+  (setf (content-type *response*) "text/plain")
+  (let ((paste (ensure-paste id)))
+    (check-permission 'view paste)
+    (dm:field paste "text")))
+
 (define-page list "plaster/list(/(.*))?" (:uri-groups (NIL page) :lquery "list.ctml")
   (check-permission 'list)
   (let* ((page (or (when page (parse-integer page :junk-allowed T)) 0))
