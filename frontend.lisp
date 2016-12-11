@@ -200,7 +200,7 @@
   `(call-with-password-protection
     (lambda () ,@body) ,paste ,password))
 
-(define-page edit "plaster/edit(/(.*))?" (:uri-groups (NIL id) :lquery "edit.ctml")
+(define-page edit "plaster/edit(?:/(.*))?" (:uri-groups (id) :lquery "edit.ctml")
   (let* ((paste (if id
                     (ensure-paste id)
                     (dm:hull 'plaster-pastes)))
@@ -237,7 +237,7 @@
     (check-permission 'view paste)
     (dm:field paste "text")))
 
-(define-page list "plaster/list(/(.*))?" (:uri-groups (NIL page) :lquery "list.ctml")
+(define-page list "plaster/list(?:/(.*))?" (:uri-groups (page) :lquery "list.ctml")
   (check-permission 'list)
   (let* ((page (or (when page (parse-integer page :junk-allowed T)) 0))
          (pastes (dm:get 'plaster-pastes (db:query (:= 'visibility 1))
@@ -248,7 +248,7 @@
                       :page page
                       :has-more (<= (config :pastes-per-page) (length pastes)))))
 
-(define-page user "plaster/user/(.*)(/(.*))?" (:uri-groups (username NIL page) :lquery "user.ctml")
+(define-page user "plaster/user/(.*)(?:/(.*))?" (:uri-groups (username page) :lquery "user.ctml")
   (check-permission 'user)
   (let* ((page (or (when page (parse-integer page :junk-allowed T)) 0))
          (user (user:get username)))
