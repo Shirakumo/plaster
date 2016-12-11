@@ -15,7 +15,6 @@ var Plaster = function(){
     }
 
     self.loadScript = function(url, callback){
-        console.log("Loading script", url);
         var script = document.createElement("script");
         script.type = "text/javascript";
         script.src = url;
@@ -24,7 +23,6 @@ var Plaster = function(){
     }
 
     self.loadStylesheet = function(url, callback){
-        console.log("Loading stylesheet", url);
         var link = document.createElement("link");
         link.type = "text/css";
         link.rel = "stylesheet";
@@ -54,7 +52,6 @@ var Plaster = function(){
     }
 
     self.createEditor = function(element, config, callback){
-        console.log("Creating editor for", element, "with", config);
         var textarea = element.getElementsByTagName("textarea")[0];
         var type = element.getElementsByClassName("type")[0];
 
