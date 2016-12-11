@@ -4,10 +4,16 @@
 (defparameter *default-api-amount* 50)
 (defparameter *maximum-api-amount* 100)
 (defparameter *password-salt* "Something ˢᵉᶜʳᵉᵗ")
+(defparameter *paste-types*
+  (list* "text"
+         (sort (mapcar #'pathname-name
+                       (uiop:directory-files (@static "codemirror/mode/")))
+               #'string<)))
 
 (define-trigger db:connected ()
   (db:create 'plaster-pastes '((title (:varchar 32))
                                (time (:integer 5))
+                               (type (:varchar 32))
                                (author (:varchar 32))
                                (visibility (:integer 1))
                                (password (:varchar 128))
@@ -68,6 +74,13 @@
       (api-error "Cannot set a password on public or unlisted visibility.")))
   (when password (cryptos:pbkdf2-hash password *password-salt*)))
 
+(defun ensure-paste-type (type)
+  (let ((type (string-downcase (or type "text"))))
+    (unless (find type *paste-types* :test #'string=)
+      (error 'api-argument-invalid :argument "type"
+                                   :message (format T "Type must be one of ~{~s~^, ~}." *paste-types*)))
+    type))
+
 (defun register-annotation (annotation paste)
   (when (paste-parent paste)
     (api-error "Cannot annotate an annotation."))
@@ -75,7 +88,7 @@
              `(("paste" . ,(dm:id (ensure-paste paste)))
                ("annotation" . ,(dm:id (ensure-paste annotation))))))
 
-(defun create-paste (text &key title parent visibility password author)
+(defun create-paste (text &key title parent visibility password author type)
   (when (and parent visibility)
     (api-error "Cannot set the visibility of an annotation."))
   (db:with-transaction ()
@@ -86,6 +99,7 @@
       (setf (dm:field paste "text") text
             (dm:field paste "title") (or title "")
             (dm:field paste "time") (get-universal-time)
+            (dm:field paste "type") (ensure-paste-type type)
             (dm:field paste "author") author
             (dm:field paste "visibility") visibility
             (dm:field paste "password") password)
@@ -103,13 +117,15 @@
       (dm:delete paste)
       paste)))
 
-(defun edit-paste (paste &key text title visibility password)
+(defun edit-paste (paste &key text title visibility password type)
   (db:with-transaction ()
     (let* ((paste (ensure-paste paste)))
       (when text
         (setf (dm:field paste "text") text))
       (when title
         (setf (dm:field paste "title") title))
+      (when type
+        (setf (dm:field paste "type") (ensure-paste-type type)))
       (when (and (paste-parent paste) visibility)
         (api-error "Cannot set the visibility of an annotation."))
       (when visibility
@@ -154,7 +170,7 @@
   (let ((table (make-hash-table :test 'eql)))
     (flet ((copy (field)
              (setf (gethash field table) (dm:field paste field))))
-      (mapcar #'copy '("title" "time" "author" "visibility" "text")))
+      (mapcar #'copy '("title" "time" "author" "visibility" "text" "type")))
     (when include-annotations
       (setf (gethash "annotations" table)
             (mapcar #'reformat-paste (paste-annotations paste))))
@@ -193,6 +209,7 @@
       (r-clip:process T :paste paste
                         :password (post/get "password")
                         :parent (when parent (dm:id parent))
+                        :types *paste-types*
                         :repaste (get-var "repaste")
                         :error (get-var "error")
                         :message (get-var "message")))))
@@ -279,21 +296,22 @@
                                   :skip skip)
              collect (reformat-paste paste :include-annotations include-annotations))))))
 
-(define-api plaster/new (text &optional title parent visibility password current-password) ()
+(define-api plaster/new (text &optional title type parent visibility password current-password) ()
   (check-permission 'new)
   (when parent (check-password parent current-password))
   (let ((paste (create-paste text :title title
+                                  :type type
                                   :parent parent
                                   :visibility visibility
                                   :password password
                                   :author (user:username (or (auth:current) (user:get "anonymous"))))))
     (api-paste-output paste)))
 
-(define-api plaster/edit (id &optional text title visibility password current-password) ()
+(define-api plaster/edit (id &optional text type title visibility password current-password) ()
   (let ((paste (ensure-paste id)))
     (check-permission 'edit paste)
     (check-password paste current-password)
-    (edit-paste id :text text :title title :visibility visibility :password password)
+    (edit-paste id :text text :title title :type type :visibility visibility :password password)
     (api-paste-output paste)))
 
 (define-api plaster/delete (id &optional current-password) ()

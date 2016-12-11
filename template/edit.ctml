@@ -36,6 +36,9 @@
         <form class="edit" method="post" action="#">
           <header>
             <input type="text" name="title" placeholder="Untitled" maxlength="32" lquery="(val title)" />
+            <select name="type" iterate="(** :types)">
+              <option lquery="(text *) (attr :value * :selected (equal * (** :type)))">TYPE</option>
+            </select>
             <c:if test="(** :parent)">
               <c:then>
                 <div class="annotate">

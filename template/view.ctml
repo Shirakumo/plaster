@@ -31,6 +31,7 @@
           <header>
             <input type="text" name="title" placeholder="Untitled" maxlength="32" readonly
                    lquery="(val title)" />
+            <span clas="type" lquery="(text type)">TYPE</span>
             <a rel="author" lquery="(text author)" @href="plaster/user/{0} author">AUTHOR</a>
             <time lquery="(time time)">2106.10.23</time>
           </header>
@@ -56,6 +57,7 @@
                 <header>
                   <input type="text" name="title" placeholder="Untitled" maxlength="32" readonly
                          lquery="(val title)" />
+                  <span clas="type" lquery="(text type)"></span>
                   <a rel="author" lquery="(text author)" @href="plaster/user/{0} author">AUTHOR</a>
                   <time lquery="(time time)">2106.10.23</time>
                 </header>
