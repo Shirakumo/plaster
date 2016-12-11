@@ -3,7 +3,7 @@ var Plaster = function(){
 
     self.loadedModes = ["text"];
     self.loadedThemes = ["default"];
-    self.staticUrl = "/static/plaster/codemirror/";
+    self.staticUrl = document.getElementById("static-codemirror-root").href;
     self.editors = [];
     self.defaultConfig = {"lineNumbers": true,
                           "lineWrapping": true,

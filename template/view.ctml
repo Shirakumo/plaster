@@ -5,6 +5,7 @@
     <title>Plaster</title>
     <link rel="stylesheet" type="text/css" href="../static/plaster.css" @href="/static/plaster/plaster.css" />
     <link rel="stylesheet" type="text/css" @href="/static/plaster/codemirror/codemirror.css" />
+    <link id="static-codemirror-root" rel="alternate" @href="/static/plaster/codemirror/" />
   </head>
   <body>
     <header>
