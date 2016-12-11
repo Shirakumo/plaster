@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <title>Plaster</title>
     <link rel="stylesheet" type="text/css" href="../static/plaster.css" @href="/static/plaster/plaster.css" />
+    <link rel="stylesheet" type="text/css" @href="/static/plaster/codemirror/codemirror.css" />
   </head>
   <body>
     <header>
@@ -36,7 +37,7 @@
         <form class="edit" method="post" action="#">
           <header>
             <input type="text" name="title" placeholder="Untitled" maxlength="32" lquery="(val title)" />
-            <select name="type" iterate="(** :types)">
+            <select class="type" name="type" iterate="(** :types)">
               <option lquery="(text *) (attr :value * :selected (equal * (** :type)))">TYPE</option>
             </select>
             <c:if test="(** :parent)">
@@ -82,5 +83,7 @@
     </main>
     <footer>
     </footer>
+    <script type="text/javascript" @src="/static/plaster/codemirror/codemirror.js" />
+    <script type="text/javascript" @src="/static/plaster/plaster.js" />
   </body>
 </html>
