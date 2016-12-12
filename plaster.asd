@@ -9,5 +9,6 @@
                (:interface :user)
                (:interface :auth)
                (:interface :profile)
+               (:interface :rate)
                :r-clip
                :crypto-shortcuts))

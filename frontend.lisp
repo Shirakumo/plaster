@@ -307,16 +307,21 @@
                                   :skip skip)
              collect (reformat-paste paste :include-annotations include-annotations))))))
 
+(rate:define-limit create (time-left :limit 2)
+  (error 'api-error :message (format NIL "Please wait ~a second~:p before pasting again."
+                                     time-left)))
+
 (define-api plaster/new (text &optional title type parent visibility password current-password) ()
-  (check-permission 'new)
-  (when parent (check-password parent current-password))
-  (let ((paste (create-paste text :title title
-                                  :type type
-                                  :parent parent
-                                  :visibility visibility
-                                  :password password
-                                  :author (user:username (or (auth:current) (user:get "anonymous"))))))
-    (api-paste-output paste)))
+  (rate:with-limitation (create)
+    (check-permission 'new)
+    (when parent (check-password parent current-password))
+    (let ((paste (create-paste text :title title
+                                    :type type
+                                    :parent parent
+                                    :visibility visibility
+                                    :password password
+                                    :author (user:username (or (auth:current) (user:get "anonymous"))))))
+      (api-paste-output paste))))
 
 (define-api plaster/edit (id &optional text type title visibility password current-password) ()
   (let ((paste (ensure-paste id)))
