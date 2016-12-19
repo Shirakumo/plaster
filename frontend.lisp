@@ -200,7 +200,7 @@
   `(call-with-password-protection
     (lambda () ,@body) ,paste ,password))
 
-(define-page edit "plaster/edit(?:/(.*))?" (:uri-groups (id) :lquery "edit.ctml")
+(define-page edit "plaster/edit(?:/(.*))?" (:uri-groups (id) :clip "edit.ctml")
   (let* ((paste (if id
                     (ensure-paste id)
                     (dm:hull 'plaster-pastes)))
@@ -219,7 +219,7 @@
                         :error (get-var "error")
                         :message (get-var "message")))))
 
-(define-page view "plaster/view/(.*)" (:uri-groups (id) :lquery "view.ctml")
+(define-page view "plaster/view/(.*)" (:uri-groups (id) :clip "view.ctml")
   (let* ((paste (ensure-paste id))
          (parent (paste-parent paste)))
     (check-permission 'view paste)
@@ -237,7 +237,7 @@
     (check-permission 'view paste)
     (dm:field paste "text")))
 
-(define-page list "plaster/list(?:/(.*))?" (:uri-groups (page) :lquery "list.ctml")
+(define-page list "plaster/list(?:/(.*))?" (:uri-groups (page) :clip "list.ctml")
   (check-permission 'list)
   (let* ((page (or (when page (parse-integer page :junk-allowed T)) 0))
          (pastes (dm:get 'plaster-pastes (db:query (:= 'visibility 1))
@@ -248,7 +248,7 @@
                       :page page
                       :has-more (<= (config :pastes-per-page) (length pastes)))))
 
-(define-page user "plaster/user/(.*)(?:/(.*))?" (:uri-groups (username page) :lquery "user.ctml")
+(define-page user "plaster/user/(.*)(?:/(.*))?" (:uri-groups (username page) :clip "user.ctml")
   (check-permission 'user)
   (let* ((page (or (when page (parse-integer page :junk-allowed T)) 0))
          (user (user:get username)))
@@ -269,7 +269,7 @@
                         :page page
                         :has-more (<= (config :pastes-per-page) (length pastes))))))
 
-(profile:define-panel pastes (:user user :lquery "user-panel.ctml")
+(profile:define-panel pastes (:user user :clip "user-panel.ctml")
   (let ((pastes (dm:get 'plaster-pastes
                         (if (and (auth:current) (or (eql (auth:current) user)
                                                     (user:check (auth:current) '(perm plaster))))
