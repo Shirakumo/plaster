@@ -5,10 +5,10 @@
   :components ((:file "module")
                (:file "frontend"))
   :depends-on ((:interface :database)
-               (:interface :data-model)
                (:interface :user)
                (:interface :auth)
                (:interface :profile)
                (:interface :rate)
+               :r-data-model
                :r-clip
                :crypto-shortcuts))
