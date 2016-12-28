@@ -11,14 +11,14 @@
     <header>
       <h1>Plaster</h1>
       <nav>
-        <c:when test="(plaster::permitted :new)">
+        <c:when test="(plaster::permitted-p :new)">
           <a href="#" @href="plaster/edit">New</a>
         </c:when>
-        <c:when test="(plaster::permitted :list)">
+        <c:when test="(plaster::permitted-p :list)">
           <a href="#" @href="plaster/list">List</a>
         </c:when>
         <c:if test="(auth:current)">
-          <c:then><c:when test="(plaster::permitted :user)">
+          <c:then><c:when test="(plaster::permitted-p :user)">
             <a href="#" @href="plaster/user/{0} (user:username (auth:current))">My Pastes</a>
           </c:when></c:then>
           <c:else>
@@ -41,6 +41,7 @@
             <select class="type" name="type" iterate="(** :types)">
               <option lquery="(text *) (attr :value * :selected (equal * (** :type)))">TYPE</option>
             </select>
+            <span style="display:none" class="theme" lquery="(text (** :theme))"/>
             <c:if test="(** :parent)">
               <c:then>
                 <div class="annotate">
@@ -70,10 +71,10 @@
                 <input type="submit" @formaction="/api/plaster/new" value="Post" />
               </c:then>
               <c:else>
-                <c:when test="(plaster::permitted :delete *)">
+                <c:when test="(plaster::permitted-p :delete *)">
                   <input type="submit" @formaction="/api/plaster/delete" value="Delete" />
                 </c:when>
-                <c:when test="(plaster::permitted :edit *)">
+                <c:when test="(plaster::permitted-p :edit *)">
                   <input type="submit" @formaction="/api/plaster/edit" value="Save" />
                 </c:when>
               </c:else>

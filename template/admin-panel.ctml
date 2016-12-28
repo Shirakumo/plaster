@@ -1,0 +1,21 @@
+<link rel="stylesheet" type="text/css" @href="/static/plaster/codemirror/codemirror.css" />
+<link id="static-codemirror-root" rel="alternate" @href="/static/plaster/codemirror/" />
+<div>
+  <h2>Editor Settings</h2>
+  <c:when test="error"><div class="notice error" lquery="(text error)"></div></c:when>
+  <c:when test="info"><div class="notice info" lquery="(text info)"></div></c:when>
+  <noscript style="display:block" class="notice error">You need to enable JavaScript for these options to take effect.</noscript>
+  <form class="box edit" method="post">
+    <label>Theme:</label><select name="theme" class="theme" iterate="themes">
+      <option lquery="(text *) (attr :value * :selected (equal * (** :theme)))">THEME</option>
+    </select><br />
+    <label>Default Type:</label><select name="type" class="type" iterate="types">
+      <option lquery="(text *) (attr :value * :selected (equal * (** :type)))">TYPE</option>
+    </select><br />
+    Preview:
+    <textarea id="preview"></textarea>
+    <div class="actionbar"><input type="submit" name="action" value="Save" /></div>
+  </form>
+</div>
+<script type="text/javascript" @src="/static/plaster/codemirror/codemirror.js" />
+<script type="text/javascript" @src="/static/plaster/plaster.js" />

@@ -1,9 +1,17 @@
+#|
+ This file is a part of Purplish
+ (c) 2016 Shirakumo http://tymoon.eu (shinmera@tymoon.eu)
+ Author: Nicolas Hafner <shinmera@tymoon.eu>
+|#
+
 (in-package #:cl-user)
 (asdf:defsystem #:plaster
   :defsystem-depends-on (:radiance)
   :class "radiance:virtual-module"
   :components ((:file "module")
-               (:file "frontend"))
+               (:file "objects")
+               (:file "frontend")
+               (:file "api"))
   :depends-on ((:interface :database)
                (:interface :user)
                (:interface :auth)

@@ -11,14 +11,14 @@
     <header>
       <h1>Plaster</h1>
       <nav>
-        <c:when test="(plaster::permitted :new)">
+        <c:when test="(plaster::permitted-p :new)">
           <a href="#" @href="plaster/edit">New</a>
         </c:when>
-        <c:when test="(plaster::permitted :list)">
+        <c:when test="(plaster::permitted-p :list)">
           <a href="#" @href="plaster/list">List</a>
         </c:when>
         <c:if test="(auth:current)">
-          <c:then><c:when test="(plaster::permitted :user)">
+          <c:then><c:when test="(plaster::permitted-p :user)">
             <a href="#" @href="plaster/user/{0} (user:username (auth:current))">My Pastes</a>
           </c:when></c:then>
           <c:else>
@@ -40,12 +40,12 @@
           <textarea name="text" placeholder="Paste something here" readonly
                     lquery="(text text)"></textarea>
           <nav class="actions">
-            <c:when test="(plaster::permitted :new)">
+            <c:when test="(plaster::permitted-p :new)">
               <a href="#" @href="plaster/view/{0}/raw?password={1} _id (** :password)">Raw</a>
               <a href="#" @href="plaster/edit?annotate={0}&password={1} _id (** :password)">Annotate</a>
               <a href="#" @href="plaster/edit/{0}?repaste&password={1} _id (** :password)">Repaste</a>
             </c:when>
-            <c:when test="(plaster::permitted :edit *)">
+            <c:when test="(plaster::permitted-p :edit *)">
               <a href="#" @href="plaster/edit/{0}?password={1} _id (** :password)">Edit</a>
             </c:when>
           </nav>
@@ -68,10 +68,10 @@
                           lquery="(text text)"></textarea>
                 <nav class="actions">
                   <a href="#" @href="plaster/view/{0}/raw?password={1} _id (** :password)">Raw</a>
-                  <c:when test="(plaster::permitted :new)">
+                  <c:when test="(plaster::permitted-p :new)">
                     <a href="#" @href="plaster/edit/{0}?repaste&password={1} _id (** :password)">Repaste</a>
                   </c:when>
-                  <c:when test="(plaster::permitted :edit *)">
+                  <c:when test="(plaster::permitted-p :edit *)">
                     <a href="#" @href="plaster/edit/{0}?password={1} _id (** :password)">Edit</a>
                   </c:when>
                 </nav>

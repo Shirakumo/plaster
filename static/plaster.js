@@ -9,12 +9,20 @@ var Plaster = function(){
                           "lineWrapping": true,
                           "viewportMargin": Infinity,};
 
+    self.log = function(){
+        var args = Array.prototype.slice.call(arguments);
+        args.unshift("[Plaster]");
+        console.log.apply(console, args);
+        return null;
+    }
+
     self.addToHead = function(element){
         document.getElementsByTagName("head")[0].appendChild(element);
         return element;
     }
 
     self.loadScript = function(url, callback){
+        self.log("Loading script",url);
         var script = document.createElement("script");
         script.type = "text/javascript";
         script.src = url;
@@ -23,6 +31,7 @@ var Plaster = function(){
     }
 
     self.loadStylesheet = function(url, callback){
+        self.log("Loading stylesheet",url);
         var link = document.createElement("link");
         link.type = "text/css";
         link.rel = "stylesheet";
@@ -54,21 +63,37 @@ var Plaster = function(){
     self.createEditor = function(element, config, callback){
         var textarea = element.getElementsByTagName("textarea")[0];
         var type = element.getElementsByClassName("type")[0];
+        var theme = element.getElementsByClassName("theme")[0];
 
         self.editors.push(element);
         if(!config) config = {};
-        if(!config.theme) config.theme = "default";
         if(!config.readOnly) config.readOnly = textarea.hasAttribute("readonly");
-        
-        if(type.tagName === "select"){
+
+        if(config.theme){
+        }else if(!theme){
+            config.theme = "default";
+        }else if(theme.tagName === "select"){
+            config.theme = theme.options[theme.selectedIndex].value;
+            theme.addEventListener("change", function(){
+                self.changeTheme(element, theme.options[theme.selectedIndex].value);
+            }, false);
+        }else{
+            config.theme = theme.textContent;
+        }
+
+        if(config.mode){
+        }else if(!type){
+            config.mode = "text";
+        }else if(type.tagName === "select"){
             config.mode = type.options[type.selectedIndex].value;
             type.addEventListener("change", function(){
                 self.changeMode(element, type.options[type.selectedIndex].value);
             }, false);
         }else{
-            if(!config.mode) config.mode = type.textContent;
+            config.mode = type.textContent;
         }
 
+        self.log("Creating mirror for",element,"with config",config);
         element.mirror = null;
         self.maybeLoadTheme(config.theme, function(){
             self.maybeLoadMode(config.mode, function(){
