@@ -22,7 +22,7 @@
 (define-page edit "plaster/edit(?:/(.*))?" (:uri-groups (id) :clip "edit.ctml")
   (let* ((paste (if id
                     (ensure-paste id)
-                    (dm:hull 'plaster-pastes)))
+                    (dm:hull 'pastes)))
          (parent (if id
                      (paste-parent paste)
                      (when (get-var "annotate") (ensure-paste (get-var "annotate"))))))
@@ -64,7 +64,7 @@
 (define-page list "plaster/list(?:/(.*))?" (:uri-groups (page) :clip "list.ctml")
   (check-permission 'list)
   (let* ((page (or (when page (parse-integer page :junk-allowed T)) 0))
-         (pastes (dm:get 'plaster-pastes (db:query (:= 'visibility 1))
+         (pastes (dm:get 'pastes (db:query (:= 'visibility 1))
                          :sort '((time :DESC))
                          :skip (* page (config :pastes-per-page))
                          :amount (config :pastes-per-page))))
@@ -78,7 +78,7 @@
          (user (user:get username)))
     (unless user
       (error 'request-not-found :message (format NIL "No such user ~s." username)))
-    (let ((pastes (dm:get 'plaster-pastes
+    (let ((pastes (dm:get 'pastes
                           (if (and (auth:current) (or (eql (auth:current) user)
                                                       (user:check (auth:current) '(perm plaster))))
                               (db:query (:= 'author username))
@@ -94,7 +94,7 @@
                         :has-more (<= (config :pastes-per-page) (length pastes))))))
 
 (profile:define-panel pastes (:user user :clip "user-panel.ctml")
-  (let ((pastes (dm:get 'plaster-pastes
+  (let ((pastes (dm:get 'pastes
                         (if (and (auth:current) (or (eql (auth:current) user)
                                                     (user:check (auth:current) '(perm plaster))))
                             (db:query (:= 'author (user:username user)))

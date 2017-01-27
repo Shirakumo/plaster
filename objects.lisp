@@ -19,15 +19,15 @@
                #'string<)))
 
 (define-trigger db:connected ()
-  (db:create 'plaster-pastes '((title (:varchar 32))
-                               (time (:integer 5))
-                               (type (:varchar 32))
-                               (author (:varchar 32))
-                               (visibility (:integer 1))
-                               (password (:varchar 128))
-                               (text :text)))
-  (db:create 'plaster-annotations '((paste :id)
-                                    (annotation :id))))
+  (db:create 'pastes '((title (:varchar 32))
+                       (time (:integer 5))
+                       (type (:varchar 32))
+                       (author (:varchar 32))
+                       (visibility (:integer 1))
+                       (password (:varchar 128))
+                       (text :text)))
+  (db:create 'annotations '((paste :id)
+                            (annotation :id))))
 
 (define-trigger user:ready ()
   (defaulted-config 25 :pastes-per-page)
@@ -58,18 +58,18 @@
   (etypecase paste-ish
     (dm:data-model paste-ish)
     (string (ensure-paste (parse-integer paste-ish)))
-    (integer (or (dm:get-one 'plaster-pastes (db:query (:= '_id paste-ish)))
+    (integer (or (dm:get-one 'pastes (db:query (:= '_id paste-ish)))
                  (error 'request-not-found :message (format NIL "No paste with ID ~a was found." paste-ish))))))
 
 (defun paste-annotations (paste)
   (let* ((paste (ensure-paste paste))
-         (rels (dm:get 'plaster-annotations (db:query (:= 'paste (dm:id paste))))))
+         (rels (dm:get 'annotations (db:query (:= 'paste (dm:id paste))))))
     (loop for rel in rels
           collect (ensure-paste (dm:field rel "annotation")))))
 
 (defun paste-parent (paste)
   (let* ((paste (ensure-paste paste))
-         (rel (dm:get-one 'plaster-annotations (db:query (:= 'annotation (dm:id paste))))))
+         (rel (dm:get-one 'annotations (db:query (:= 'annotation (dm:id paste))))))
     (when rel
       (ensure-paste (dm:field rel "paste")))))
 
@@ -101,7 +101,7 @@
 (defun register-annotation (annotation paste)
   (when (paste-parent paste)
     (api-error "Cannot annotate an annotation."))
-  (db:insert 'plaster-annotations
+  (db:insert 'annotations
              `(("paste" . ,(dm:id (ensure-paste paste)))
                ("annotation" . ,(dm:id (ensure-paste annotation))))))
 
@@ -109,7 +109,7 @@
   (when (and parent visibility)
     (api-error "Cannot set the visibility of an annotation."))
   (db:with-transaction ()
-    (let* ((paste (dm:hull 'plaster-pastes))
+    (let* ((paste (dm:hull 'pastes))
            (parent (when parent (ensure-paste parent)))
            (visibility (if parent 2 (ensure-visibility visibility)))
            (password (ensure-password visibility password)))
@@ -128,7 +128,7 @@
   (db:with-transaction ()
     (let ((paste (ensure-paste paste)))
       (mapc #'dm:delete (paste-annotations paste))
-      (db:remove 'plaster-annotations
+      (db:remove 'annotations
                  (db:query (:or (:= 'paste (dm:id paste))
                                 (:= 'annotation (dm:id paste)))))
       (dm:delete paste)

@@ -33,7 +33,7 @@
                        (T
                         (db:query (:= 'visibility 1))))))
       (api-output
-       (loop for paste in (dm:get 'plaster-pastes query
+       (loop for paste in (dm:get 'pastes query
                                   :sort '((time :DESC))
                                   :amount amount
                                   :skip skip)
