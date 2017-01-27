@@ -149,4 +149,4 @@ var Plaster = function(){
 }
 
 var plaster = new Plaster();
-document.addEventListener("DOMContentLoaded", plaster.init, false);
+window.onload = plaster.init
