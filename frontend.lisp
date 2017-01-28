@@ -116,3 +116,6 @@
                         :type (or* (user:field "plaster-type" (auth:current)) "text")
                         :theme (or* (user:field "plaster-theme" (auth:current)) "default")
                         :error error :info info))))
+
+(define-page frontpage "plaster/^$" ()
+  (redirect #@"plaster/edit"))
