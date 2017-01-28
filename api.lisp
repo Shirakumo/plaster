@@ -47,6 +47,10 @@
   (rate:with-limitation (create)
     (check-permission 'new)
     (when parent (check-password parent current-password))
+    (when (or (or* (post/get "username"))
+              (or* (post/get "subject"))
+              (or* (post/get "email")))
+      (error 'request-denied :message "You seem like a spammer."))
     (let ((paste (create-paste text :title title
                                     :type type
                                     :parent parent

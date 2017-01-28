@@ -82,6 +82,8 @@
      (.actions
       :display flex
       :justify-content flex-end
+      ("input[placeholder='Empty']"
+       :display none)
       ((:or a input)
        :display inline-block)))
     ("#annotations"

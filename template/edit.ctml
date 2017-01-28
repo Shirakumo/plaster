@@ -62,6 +62,9 @@
           </header>
           <textarea name="text" placeholder="Paste something here" autofocus required lquery="(text text)"></textarea>
           <nav class="actions">
+            <input type="text" placeholder="Empty" autofill="off" name="username" />
+            <input type="text" placeholder="Empty" autofill="off" name="subject" />
+            <input type="text" placeholder="Empty" autofill="off" name="email" />
             <input type="hidden" name="id" lquery="(val _id)" />
             <input type="hidden" name="browser" value="true" />
             <input type="hidden" name="parent" lquery="(val (** :parent))" />
