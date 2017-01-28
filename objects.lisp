@@ -57,7 +57,9 @@
 (defun ensure-paste (paste-ish)
   (etypecase paste-ish
     (dm:data-model paste-ish)
-    (string (ensure-paste (parse-integer paste-ish)))
+    (string (ensure-paste
+             (or (ignore-errors (db:ensure-id paste-ish))
+                 (error 'request-not-found :message (format NIL "No paste with ID ~s was found." paste-ish)))))
     (integer (or (dm:get-one 'pastes (db:query (:= '_id paste-ish)))
                  (error 'request-not-found :message (format NIL "No paste with ID ~a was found." paste-ish))))))
 
