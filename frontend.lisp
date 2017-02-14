@@ -29,7 +29,7 @@
     (if id
         (check-permission '(edit delete) paste)
         (check-permission 'new))
-    (when id
+    (unless id
       (setf (dm:field paste "type") (or* (user:field "plaster-type" (auth:current "anonymous"))
                                          "text")))
     (with-password-protection ((or parent paste))
