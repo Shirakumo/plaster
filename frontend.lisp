@@ -55,7 +55,7 @@
                             :annotations (sort (paste-annotations paste)
                                                #'< :key (lambda (a) (dm:field a "time"))))))))
 
-(define-page raw "plaster/view/(.*)/raw" (:uri-groups (id))
+(define-page raw "plaster/view/([^/]*)/raw" (:uri-groups (id))
   (setf (content-type *response*) "text/plain")
   (let ((paste (ensure-paste id)))
     (check-permission 'view paste)
@@ -72,7 +72,7 @@
                       :page page
                       :has-more (<= (config :pastes-per-page) (length pastes)))))
 
-(define-page user "plaster/user/(.*)(?:/(.*))?" (:uri-groups (username page) :clip "user.ctml")
+(define-page user "plaster/user/([^/]*)(?:/(.*))?" (:uri-groups (username page) :clip "user.ctml")
   (check-permission 'user)
   (let* ((page (or (when page (parse-integer page :junk-allowed T)) 0))
          (user (user:get username)))
