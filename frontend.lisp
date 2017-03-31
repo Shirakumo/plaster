@@ -53,7 +53,9 @@
           (r-clip:process T :paste paste
                             :password (post/get "password")
                             :annotations (sort (paste-annotations paste)
-                                               #'< :key (lambda (a) (dm:field a "time"))))))))
+                                               #'< :key (lambda (a) (dm:field a "time")))
+                            :theme (or* (user:field "plaster-theme" (auth:current "anonymous"))
+                                        "default"))))))
 
 (define-page raw "plaster/view/([^/]*)/raw" (:uri-groups (id))
   (setf (content-type *response*) "text/plain")
