@@ -61,7 +61,8 @@
   (setf (content-type *response*) "text/plain")
   (let ((paste (ensure-paste id)))
     (check-permission 'view paste)
-    (dm:field paste "text")))
+    (with-password-protection (paste)
+      (dm:field paste "text"))))
 
 (define-page list "plaster/list(?:/(.*))?" (:uri-groups (page) :clip "list.ctml")
   (check-permission 'list)
