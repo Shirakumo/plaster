@@ -58,10 +58,10 @@
                                         "default"))))))
 
 (define-page raw "plaster/view/([^/]*)/raw" (:uri-groups (id))
-  (setf (content-type *response*) "text/plain")
   (let ((paste (ensure-paste id)))
     (check-permission 'view paste)
     (with-password-protection (paste)
+      (setf (content-type *response*) "text/plain")
       (dm:field paste "text"))))
 
 (define-page list "plaster/list(?:/(.*))?" (:uri-groups (page) :clip "list.ctml")
