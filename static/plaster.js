@@ -144,6 +144,11 @@ var Plaster = function(){
 
     self.init = function(){
         self.initEditors();
+        // Make sure to jump after editors have been created.
+        // The initial anchor won't work otherwise.
+        var hash = location.hash;
+        location.hash = "";
+        location.hash = hash;
         return true;
     }
 }
