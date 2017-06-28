@@ -62,10 +62,10 @@
      :color #(main-fg))
     (.edit
      (header
-      (a[rel=author] :background none)
-      ("a[rel=author]:hover" :color inherit)
+      (a :background none)
+      ("a:hover" :color inherit)
+      ("a[rel=bookmark]" :margin-left auto :font-weight normal)
       ("a[rel=author]:before" :content "by ")
-      (time :margin-left auto)
       ("span.type:before" :content "as "))
      (textarea
       :width 100%
