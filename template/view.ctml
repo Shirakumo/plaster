@@ -38,8 +38,8 @@
             <a rel="author" lquery="(text author)" @href="plaster/user/{0} author">AUTHOR</a>
             <a rel="bookmark" @href="plaster/view/{0} _id"><time lquery="(time time)">2106.10.23</time></a>
           </header>
-          <textarea name="text" placeholder="Paste something here" readonly
-                    lquery="(text text)"></textarea>
+          <div name="text" class="text" placeholder="Paste something here" readonly
+               lquery="(text text)"></div>
           <nav class="actions">
             <c:when test="(plaster::permitted-p :new)">
               <a href="#" @href="plaster/view/{0}/raw?password={1} _id (** :password)">Raw</a>
@@ -65,8 +65,8 @@
                   <a rel="author" lquery="(text author)" @href="plaster/user/{0} author">AUTHOR</a>
                   <a rel="bookmark" @href="plaster/view/{0} _id"><time lquery="(time time)">2106.10.23</time></a>
                 </header>
-                <textarea name="text" placeholder="Paste something here" readonly
-                          lquery="(text text)"></textarea>
+                <div name="text" class="text" placeholder="Paste something here" readonly
+                     lquery="(text text)"></div>
                 <nav class="actions">
                   <a href="#" @href="plaster/view/{0}/raw?password={1} _id (** :password)">Raw</a>
                   <c:when test="(plaster::permitted-p :new)">

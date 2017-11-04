@@ -60,7 +60,7 @@
               </c:else>
             </c:if>
           </header>
-          <textarea name="text" placeholder="Paste something here" autofocus required lquery="(text text)"></textarea>
+          <textarea name="text" class="text" placeholder="Paste something here" autofocus required lquery="(text text)"></textarea>
           <nav class="actions">
             <input type="text" placeholder="Empty" autofill="off" name="username" />
             <input type="text" placeholder="Empty" autofill="off" name="subject" />

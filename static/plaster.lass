@@ -57,7 +57,7 @@
      ([name=title] :width 400px)
      (.visibility :font-size 0.8em
                   :padding-left 5px))
-    ((:or (.edit textarea) (.paste-list ul))
+    ((:or (.edit .text) (.paste-list ul))
      :background #(main-bg)
      :color #(main-fg))
     (.edit
@@ -67,7 +67,9 @@
       ("a[rel=bookmark]" :margin-left auto :font-weight normal)
       ("a[rel=author]:before" :content "by ")
       ("span.type:before" :content "as "))
-     (textarea
+     (.text
+      :display inline-block
+      :white-space pre-wrap
       :width 100%
       :padding 5px
       :min-height 200px
@@ -75,6 +77,8 @@
       :display block
       :font-family monospace
       :font-size 1.0em)
+     (textarea.text
+      :min-height 500px)
      (".CodeMirror-scroll"
       :min-height 200px)
      (".CodeMirror"
@@ -100,7 +104,7 @@
         :padding 5px
         :font-size 0.8em
         :border-width 1px)
-       (textarea
+       (.text
         :min-height 100px))))
     (.button
      :display block)
