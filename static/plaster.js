@@ -61,13 +61,25 @@ var Plaster = function(){
     }
 
     self.createEditor = function(element, config, callback){
-        var textarea = element.getElementsByTagName("textarea")[0];
+        var text = element.getElementsByClassName("text")[0];
         var type = element.getElementsByClassName("type")[0];
         var theme = element.getElementsByClassName("theme")[0];
+        var textarea;
+
+        if(text.tagName !== "textarea"){
+            textarea = document.createElement("textarea");
+            for(var i=0; i<text.attributes.length; i++){
+                textarea.setAttribute(text.attributes[i].name, text.attributes[i].value);
+            }
+            textarea.innerHTML = text.innerHTML;
+            text.parentNode.replaceChild(textarea, text);
+        }else{
+            textarea = text;
+        }
 
         self.editors.push(element);
         if(!config) config = {};
-        if(!config.readOnly) config.readOnly = textarea.hasAttribute("readonly");
+        if(!config.readOnly) config.readOnly = text.hasAttribute("readonly");
 
         if(config.theme){
         }else if(!theme){
