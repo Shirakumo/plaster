@@ -1,6 +1,7 @@
 var Plaster = function(){
     var self = this;
 
+    self.typeMap = {};
     self.loadedModes = ["text"];
     self.loadedThemes = ["default"];
     self.staticUrl = document.getElementById("static-codemirror-root").href;
@@ -53,11 +54,23 @@ var Plaster = function(){
     self.maybeLoadMode = function(mode, callback){
         if(self.loadedModes.indexOf(mode) === -1){
             self.loadedModes.push(mode);
-            self.loadScript(self.staticUrl + "mode/"+mode+".js", callback);
+            self.loadScript(self.staticUrl + self.modePath(mode), callback);
         }else{
             if(callback) callback();
         }
         return true;
+    }
+
+    self.modeMIME = function(mode){
+        var info = self.typeMap[mode];
+        if(info) return info.mime;
+        else     return mode;
+    }
+
+    self.modePath = function(mode){
+        var info = self.typeMap[mode];
+        if(info) return info.path;
+        else     return "mode/"+mode+".js";
     }
 
     self.createEditor = function(element, config, callback){
@@ -110,6 +123,7 @@ var Plaster = function(){
         self.maybeLoadTheme(config.theme, function(){
             self.maybeLoadMode(config.mode, function(){
                 textarea.removeAttribute("required");
+                config.mode = self.modeMIME(config.mode);
                 element.mirror = CodeMirror.fromTextArea(textarea, config);
                 if(callback) callback(element);
             });
@@ -129,7 +143,7 @@ var Plaster = function(){
     self.changeMode = function(element, mode){
         if(!element.mirror) throw element+" is not an initialized CodeMirror editor.";
         self.maybeLoadMode(mode, function(){
-            element.mirror.setOption("mode", mode);
+            element.mirror.setOption("mode", self.modeMIME(mode));
         });
         return element;
     }

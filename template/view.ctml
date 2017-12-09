@@ -86,5 +86,6 @@
     </footer>
     <script type="text/javascript" @src="/static/plaster/codemirror/codemirror.js" />
     <script type="text/javascript" @src="/static/plaster/plaster.js" />
+    <script type="text/javascript" @src="/static/plaster/type-map.js" />
   </body>
 </html>

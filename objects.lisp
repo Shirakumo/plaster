@@ -8,9 +8,9 @@
 
 (defparameter *paste-types*
   (list* "text"
-         (sort (mapcar #'pathname-name
-                       (uiop:directory-files (@static "codemirror/mode/")))
-               #'string<)))
+         (with-open-file (s (@static "codemirror/mimes.txt"))
+           (loop for line = (read-line s NIL)
+                 while line collect (subseq line 0 (position #\  line))))))
 
 (defparameter *paste-themes*
   (list* "default"
@@ -194,3 +194,21 @@
       (setf (gethash "annotations" table)
             (mapcar #'reformat-paste (paste-annotations paste))))
     table))
+
+(defun generate-type-map-js (&key (mimes (@static "codemirror/mimes.txt")) (file (@static "type-map.js")))
+  (let ((table (make-hash-table :test 'equal)))
+    (with-open-file (s mimes)
+      (loop for line = (read-line s NIL)
+            while line
+            do (let* ((s1 (position #\  line))
+                      (s2 (position #\  line :start (1+ s1)))
+                      (name (subseq line 0 s1))
+                      (mime (subseq line (1+ s1) s2))
+                      (path (subseq line (1+ s2))))
+                 (setf (gethash name table) (list mime path)))))
+    (with-open-file (o file :direction :output :if-exists :supersede)
+      (format o "plaster.typeMap = {~%")
+      (loop for name being the hash-keys of table
+            for (mime path) being the hash-values of table
+            do (format o "  ~s: {mime: ~s, path: ~s},~%" name mime path))
+      (format o "}"))))
