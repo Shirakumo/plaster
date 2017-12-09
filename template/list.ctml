@@ -48,5 +48,8 @@
         </c:when>
       </section>
     </main>
+    <footer>
+      Running on <a href="https://github.com/Shirakumo/plaster">Plaster</a>
+    </footer>
   </body>
 </html>

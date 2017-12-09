@@ -87,6 +87,7 @@
       </c:using>
     </main>
     <footer>
+      Running on <a href="https://github.com/Shirakumo/plaster">Plaster</a>
     </footer>
     <script type="text/javascript" @src="/static/plaster/codemirror/codemirror.js" />
     <script type="text/javascript" @src="/static/plaster/plaster.js" />

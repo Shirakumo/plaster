@@ -29,6 +29,16 @@
          :vertical-align bottom
          (a :margin 0 10px 0 0
             :background #(header-bg))))
+   (>footer
+    :text-align center
+    :color (rgb 100 100 100)
+    (a
+     :background none
+     :color inherit
+     :padding 0)
+    ((:and a :hover)
+     :background none
+     :color #(flavour)))
    (.infobox
     :background (rgb 100 100 100)
     :color (rgb 255 255 255)
