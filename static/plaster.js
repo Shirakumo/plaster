@@ -118,6 +118,9 @@ var Plaster = function(){
             config.mode = type.textContent;
         }
 
+        config.matchBrackets = true;
+        config.autoCloseBrackets = true;
+        
         self.log("Creating mirror for",element,"with config",config);
         element.mirror = null;
         self.maybeLoadTheme(config.theme, function(){

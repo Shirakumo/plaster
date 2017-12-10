@@ -86,6 +86,7 @@
       Running on <a href="https://github.com/Shirakumo/plaster">Plaster</a>
     </footer>
     <script type="text/javascript" @src="/static/plaster/codemirror/codemirror.js" />
+    <script type="text/javascript" @src="/static/plaster/codemirror/addon/edit/matchbrackets.js" />
     <script type="text/javascript" @src="/static/plaster/plaster.js" />
     <script type="text/javascript" @src="/static/plaster/type-map.js" />
   </body>
