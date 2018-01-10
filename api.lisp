@@ -75,4 +75,4 @@
         (redirect (uri-to-url "plaster/edit"
                               :representation :external
                               :query '(("message" . "Paste deleted"))))
-        (api-output `(("_id" . ,(dm:id paste)))))))
+        (api-output `(("_id" ,(dm:id paste)))))))
