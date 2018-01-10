@@ -20,6 +20,8 @@ Using the [plaster.el](https://github.com/Shirakumo/plaster/blob/rewrite/plaster
   Opens an existing paste in a buffer
 * `plaster-paste-buffer`  
   Pastes the current buffer to a new paste
+* `plaster-paste-region`  
+  Pastes the current region to a new paste
 * `plaster-new`  
   Opens a new buffer for a new paste
 * `plaster-annotate`  

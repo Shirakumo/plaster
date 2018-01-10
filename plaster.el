@@ -24,6 +24,8 @@
 ;;     Opens an existing paste in a buffer
 ;; - plaster-paste-buffer
 ;;     Pastes the current buffer to a new paste
+;; - plaster-paste-region
+;;     Pastes the current region to a new paste
 ;; - plaster-new
 ;;     Opens a new buffer for a new paste
 ;; - plaster-annotate                    (C-x C-a)
@@ -70,6 +72,34 @@
 
 (defvar plaster-mode-map (make-sparse-keymap)
   "Keymap for function ‘plaster-mode’.")
+
+(defvar plaster-types '("text" "apl" "aspx" "asterisk" "brainfuck" "c" "c++hdr"
+                        "c++src" "cassandra" "ceylon" "clojure" "clojurescript"
+                        "cmake" "cobol" "coffeescript" "common-lisp" "crystal"
+                        "csharp" "css" "cypher-query" "cython" "d" "dart"
+                        "diff" "django" "dockerfile" "dylan" "ebnf" "ecl"
+                        "ecmascript" "edn" "eiffel" "ejs" "elm" "erb" "erlang"
+                        "ez80" "factor" "fcl" "feature" "forth" "fortran"
+                        "fragment" "gfm" "go" "gql" "groovy" "gss" "haml"
+                        "handlebars-template" "haskell" "haxe" "hive" "html"
+                        "http" "httpd-php" "httpd-php-open" "hxml" "ini" "java"
+                        "javascript" "json" "jsp" "jsx" "julia" "kotlin"
+                        "latex" "less" "literate-haskell" "lua" "mariadb"
+                        "markdown" "mbox" "mirc" "mscgen" "msgenny" "mssql"
+                        "mumps" "mysql" "n-triples" "nesc" "nginx-conf" "nsis"
+                        "objectivec" "octave" "oz" "pascal" "perl" "pgp"
+                        "pgp-keys" "pgp-signature" "pgsql" "php" "pig" "plsql"
+                        "properties" "protobuf" "puppet" "python" "q"
+                        "rpm-changes" "rpm-spec" "rsrc" "ruby" "rustsrc" "sas"
+                        "sass" "scala" "scheme" "scss" "sieve" "slim" "smarty"
+                        "solr" "soy" "sparql-query" "spreadsheet" "sql"
+                        "squirrel" "stex" "styl" "swift" "systemverilog" "tcl"
+                        "textile" "tiddlywiki" "tiki" "tlv" "tornado"
+                        "ttcn-asn" "ttcn-cfg" "turtle" "twig" "typescript"
+                        "typescript-jsx" "vb" "vbscript" "velocity" "verilog"
+                        "vertex" "vhdl" "vue" "webidl" "xml" "xml-dtd"
+                        "xquery" "xu" "yaml" "z80")
+  "List of all available paste types in plaster.")
 
 (defvar-local plaster-id nil
   "The paste ID associated with this buffer.")
@@ -124,6 +154,13 @@ Optional argument DOMAIN The cookie's active domain."
         (implicit-mode (intern-soft (concat type "-mode"))))
     (or (and explicit-mode (fboundp explicit-mode) explicit-mode)
         (and implicit-mode (fboundp implicit-mode) implicit-mode))))
+
+(defun plaster-mode-type (mode)
+  "Return the name of a suitable type for the given Emacs MODE if any."
+  (let ((explicit-type (car (rassoc mode plaster-type-mode-map)))
+        (implicit-type (substring (symbol-name mode) 0 (cl-search "-mode" (symbol-name mode) :from-end t))))
+    (or (and explicit-type (member explicit-type plaster-types) explicit-type)
+        (and implicit-type (member implicit-type plaster-types) implicit-type))))
 
 (defun plaster-request (endpoint params)
   "Perform a request against the Radiance API.
@@ -222,7 +259,7 @@ Optional argument TYPE The paste type to use.
 Optional argument TITLE The title for the paste."
   (interactive)
   (let* ((type (or type
-                   (car (rassoc major-mode plaster-type-mode-map))
+                   (plaster-mode-type major-mode)
                    (read-string "Paste type: " "text")))
          (title (or title
                     (read-string "Paste title: " (buffer-name))))
@@ -236,6 +273,29 @@ Optional argument TITLE The title for the paste."
     (let ((url (plaster-paste-url plaster-id)))
       (kill-new url)
       (message "Paste now available at: %s" url))))
+
+(defun plaster-paste-region (&optional type title)
+  "Paste the currently active region to a new remote paste.
+
+This creates a fresh paste on the remote Plaster server.
+On successful save, the new paste's URL is displayed in
+the minibuffer and copied to the ‘kill-ring’ for you.
+
+Optional argument TYPE The paste type to use.
+Optional argument TITLE The title for the paste."
+  (interactive)
+  (let* ((mode major-mode)
+         (type (or type
+                   (plaster-mode-type major-mode)
+                   (read-string "Paste type: " "text")))
+         (title (or title
+                    (read-string "Paste title: " (buffer-name))))
+         (text (buffer-substring (mark) (point))))
+    (with-current-buffer (generate-new-buffer title)
+      (insert text)
+      (funcall mode)
+      (switch-to-buffer (current-buffer))
+      (plaster-paste-buffer type title))))
 
 (defun plaster-save-paste (&optional id)
   "Save the current paste.
