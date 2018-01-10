@@ -1,0 +1,262 @@
+;;; plaster.el --- Pasting to a plaster host with Emacs buffers. -*- lexical-binding: t; -*-
+
+;; Copyright (c) 2017 Nicolas Hafner
+;;
+;; Author: Nicolas Hafner <shinmera@tymoon.eu>
+;; URL: http://github.com/shirakumo/plaster/
+;; Package-Requires: ((emacs "24"))
+;; Version: 1.0
+;; Keywords: convenience, usability
+
+;; This file is not part of GNU Emacs.
+
+;;; License:
+;; Licensed under the Artistic License 2.0
+
+(defgroup plaster nil
+  "Pasting to a plaster host with Emacs buffers."
+  :group 'extensions
+  :group 'convenience
+  :link '(emacs-library-link :tag "Lisp File" "plaster.el"))
+
+(defcustom plaster-root "https://plaster.tymoon.eu/"
+  "The root URL part for all plaster requests."
+  :type 'string
+  :group 'plaster)
+
+(defcustom plaster-session-token ""
+  "The cookie used to identify the plaster session."
+  :type 'string
+  :group 'plaster)
+
+(defcustom plaster-type-mode-map '(("c++hdr" . c++-mode)
+                                   ("c++src" . c++-mode)
+                                   ("ecmascript" . js-mode)
+                                   ("html" . web-mode)
+                                   ("mssql" . sql-mode)
+                                   ("mysql" . sql-mode)
+                                   ("pgsql" . sql-mode)
+                                   ("plsql" . sql-mode)
+                                   ("rustsrc" . rust-mode)
+                                   ("xml" . nxml-mode)
+                                   ("xml-dtd" . nxml-mode))
+  "A map of plaster paste types to emacs modes."
+  :type '(alist :key-type string :value-type symbol))
+
+(defvar plaster-mode-map (make-sparse-keymap)
+  "Keymap for plaster-mode.")
+
+(defvar-local plaster-id nil
+  "The paste ID associated with this buffer.")
+
+(defvar-local plaster-parent nil
+  "The parent paste ID associated with this buffer.")
+
+(require 'url)
+(require 'json)
+
+(defun plaster-find-session-token (cookies)
+  (let* ((domain (url-host (url-generic-parse-url plaster-api)))
+         (cookies (dolist (cookie cookies)
+                    (when (or (cl-search (car cookie) domain)
+                              (cl-search domain (car cookie)))
+                      (return (cdr cookie))))))
+    (dolist (cookie cookies)
+      (when (equal (aref cookie 1) "radiance-session")
+        (return (aref cookie 2))))))
+
+(defun plaster-make-cookie (var val &optional time path domain)
+  (let ((time (or time (format-time-string "%a, %d %b %Y %H:%M:%S %z" (+ (float-time) 3600))))
+        (path (or path "/"))
+        (domain (or domain (url-host (url-generic-parse-url plaster-api)))))
+    `[url-cookie ,var ,val ,time ,path ,domain nil]))
+
+(defun plaster-api (endpoint)
+  (concat plaster-root "api/plaster/" endpoint))
+
+(defun plaster-paste-url (id)
+  (concat plaster-root "view/" id))
+
+(defun plaster-to-string (a)
+  (with-output-to-string (princ a)))
+
+(defun plaster-type-mode (type)
+  (let ((explicit-mode (cdr (assoc type plaster-type-mode-map)))
+        (implicit-mode (intern-soft (concat type "-mode"))))
+    (or (and explicit-mode (fboundp explicit-mode) explicit-mode)
+        (and implicit-mode (fboundp implicit-mode) implicit-mode))))
+
+(defun plaster-request (endpoint params)
+  (let ((url-request-method "POST")
+        (url-cookie-storage
+          (when plaster-session-token
+            `((,(url-host (url-generic-parse-url plaster-api))
+               ,(plaster-make-cookie "radiance-session" plaster-session-token)))))
+        (url-request-extra-headers
+          '(("Content-Type" . "application/x-www-form-urlencoded")))
+        (url-request-data
+          (mapconcat (lambda (arg)
+                       (concat (url-hexify-string (car arg))
+                               "="
+                               (url-hexify-string (plaster-to-string (cdr arg)))))
+                     params
+                     "&")))
+    (let ((response (with-current-buffer (url-retrieve-synchronously endpoint)
+                      (goto-char (point-min))
+                      (re-search-forward "^$")
+                      (delete-region (point) (point-min))
+                      (json-read-from-string (buffer-string)))))
+      (unless (= 200 (cdr (assoc 'status response)))
+        (error "Plaster request failed: %s" (cdr (assoc 'message response))))
+      (setq plaster-session-token (plaster-find-session-token url-cookie-storage))
+      (cdr (assoc 'data response)))))
+
+(defun plaster-login (&optional username password)
+  "Log in to the remote plaster server.
+
+On successful log in this will update the
+plaster-session-token to a token that should be
+associated with the given account."
+  (interactive)
+  (let* ((username (or username (read-string "Username: ")))
+         (password (or password (read-string "Password: "))))
+    (setq plaster-session-token nil)
+    (condition-case-unless-debug
+     error
+     (message "%s" (plaster-request (concat plaster-root "api/simple-auth/login")
+                                    `(("username" . ,username)
+                                      ("password" . ,password))))
+     (error
+      (message "%s" (error-message-string error))))))
+
+(defun plaster-visit (&optional id)
+  "Visit an existing paste in a new buffer.
+
+If no ID is given, it will query you for one in the
+minibuffer. If the remote paste exists and is accessible
+to you, the paste's contents will be opened in a new
+buffer in plaster-mode."
+  (interactive)
+  (let ((id (or id (read-string "Paste ID: "))))
+    (when (equal id "") (return))
+    (let* ((data (plaster-request (plaster-api "view")
+                                  `(("id" . ,id))))
+           (mode (plaster-type-mode (cdr (assoc 'type data)))))
+      (with-current-buffer (generate-new-buffer (cdr (assoc 'title data)))
+        (setq plaster-id (plaster-to-string (cdr (assoc '_id data))))
+        (insert (cdr (assoc 'text data)))
+        (goto-char (point-min))
+        (replace-string "\n" "\n")
+        (when mode
+          (funcall mode))
+        (plaster-mode)
+        (switch-to-buffer (current-buffer))
+        (message "Now viewing paste from %s" (plaster-paste-url id))))))
+
+(defun plaster-update (id &optional (text (buffer-string)))
+  "Updates the specified text with the given text.
+
+By default the current buffer string is used."
+  (plaster-request (plaster-api "edit")
+                   `(("id" . ,id)
+                     ("text" . ,text)))
+  (message "Paste updated."))
+
+(defun plaster-paste-buffer (&optional type title)
+  "Paste the current buffer to a new remote paste.
+
+This creates a fresh paste on the remote Plaster server.
+On successful save, the new paste's URL is displayed in
+the minibuffer and copied to the kill-ring for you."
+  (interactive)
+  (let* ((type (or type
+                   (car (rassoc major-mode plaster-type-mode-map))
+                   (read-string "Paste type: " "text")))
+         (title (or title
+                    (read-string "Paste title: " (buffer-name))))
+         (data (plaster-request (plaster-api "new")
+                                `(("text" . ,(buffer-string))
+                                  ("title" . ,title)
+                                  ("type" . ,type)
+                                  ("parent" . ,(or plaster-parent ""))))))
+    (unless plaster-mode (plaster-mode))
+    (setq plaster-id (plaster-to-string (cdr (assoc '_id data))))
+    (let ((url (plaster-paste-url plaster-id)))
+      (kill-new url)
+      (message "Paste now available at: %s" url))))
+
+(defun plaster-save-paste (&optional id)
+  "Save the current paste.
+
+If the current buffer does not represent a paste, a new
+paste is created for it."
+  (interactive)
+  (let ((id (or id plaster-id)))
+    (if id
+        (plaster-update id)
+        (plaster-paste-buffer))))
+
+(defun plaster-save ()
+  "Save the current paste.
+
+If the current buffer represents a file, then the usual
+save-buffer is performed as well. If the current buffer
+does not represent a paste, a new paste is created for it."
+  (interactive)
+  (when buffer-file-name
+    (save-buffer))
+  (plaster-save-paste))
+
+(defun plaster-new ()
+  "Visit a new buffer that represents a paste.
+
+The remote paste will be automatically created when the buffer
+is opened."
+  (interactive)
+  (let* ((type (read-string "Paste type: " "text"))
+         (title (read-string "Paste title: ")))
+    (with-current-buffer (generate-new-buffer title)
+      (insert " ")
+      (switch-to-buffer (current-buffer))
+      (plaster-paste-buffer type title))))
+
+(defun plaster-annotate (&optional parent)
+  "Create an annotation to a paste.
+
+If the current buffer represents a paste, then the annotation
+will be made against that paste."
+  (interactive)
+  (let ((id (or parent plaster-parent plaster-id (read-string "Parent paste: "))))
+    (with-current-buffer (generate-new-buffer (concat "Annotation to " (plaster-to-string id)))
+      (setq plaster-parent id)
+      (plaster-mode)
+      (switch-to-buffer (current-buffer)))))
+
+(defun plaster-delete (&optional id)
+  "Delete a plaster paste.
+
+If the current buffer represents a paste, then it will delete
+this paste and close the buffer."
+  (interactive)
+  (let ((id (or id plaster-id (read-string "Paste ID: "))))
+    (plaster-request (plaster-api "delete")
+                     `(("id" . ,id)))
+    (when (equal plaster-id (plaster-to-string id))
+      (kill-buffer))
+    (message "Paste %s has been deleted." (plaster-to-string id))))
+
+(define-minor-mode plaster-mode
+  "Toggle Plaster mode.
+
+Within this mode, you can automatically manage the remote pastes
+through simple keystrokes."
+  :group 'plaster
+  :lighter " Plaster"
+  :keymap plaster-mode-map)
+
+(define-key plaster-mode-map (kbd "C-x C-s") #'plaster-save)
+(define-key plaster-mode-map (kbd "C-x C-k") #'plaster-delete)
+(define-key plaster-mode-map (kbd "C-x C-a") #'plaster-annotate)
+;; (define-key plaster-mode-map (kbd ""))
+
+(provide 'plaster)
