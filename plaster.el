@@ -56,8 +56,8 @@
   :type 'string
   :group 'plaster)
 
-(defcustom plaster-type-mode-map '(("c++hdr" . c++-mode)
-                                   ("c++src" . c++-mode)
+(defcustom plaster-type-mode-map '(("c++src" . c++-mode)
+                                   ("c++hdr" . c++-mode)
                                    ("ecmascript" . js-mode)
                                    ("html" . web-mode)
                                    ("mssql" . sql-mode)
