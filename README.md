@@ -29,7 +29,7 @@ Using the [plaster.el](https://github.com/Shirakumo/plaster/blob/rewrite/plaster
 * `plaster-delete`  
   Delete the current buffer's paste (C-x C-k)
 
-The keybindings are for when you're in a buffer with `plaster-mode` active.
+The keybindings are for when you're in a buffer with `plaster-mode` active. When you create a new paste, the URL is automatically placed into your kill-ring.
 
 You can also use the customize-group `plaster` to edit some settings:
 
