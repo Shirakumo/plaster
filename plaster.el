@@ -1,17 +1,42 @@
-;;; plaster.el --- Pasting to a plaster host with Emacs buffers. -*- lexical-binding: t; -*-
+;;; plaster.el --- Pasting to a plaster host with buffers. -*- lexical-binding: t; -*-
 
 ;; Copyright (c) 2017 Nicolas Hafner
 ;;
 ;; Author: Nicolas Hafner <shinmera@tymoon.eu>
 ;; URL: http://github.com/shirakumo/plaster/
-;; Package-Requires: ((emacs "24"))
+;; Package-Requires: ((emacs "24.3"))
 ;; Version: 1.0
-;; Keywords: convenience, usability
+;; Keywords: convenience, paste service
 
 ;; This file is not part of GNU Emacs.
 
 ;;; License:
 ;; Licensed under the Artistic License 2.0
+
+;;; Commentary:
+
+;; The following commands are available:
+;;
+;; - plaster-login
+;;     If you have a plaster account, use this
+;;     to log yourself in.
+;; - plaster-visit
+;;     Opens an existing paste in a buffer
+;; - plaster-paste-buffer
+;;     Pastes the current buffer to a new paste
+;; - plaster-new
+;;     Opens a new buffer for a new paste
+;; - plaster-annotate                    (C-x C-a)
+;;     Create an annotation for the current paste
+;; - plaster-save                        (C-x C-s)
+;;     Save the current buffer as a paste
+;; - plaster-delete                      (C-x C-d)
+;;     Delete the current buffer's paste
+;;
+;; The keybindings mentioned are only active in
+;; plaster-mode buffers.
+
+;;; Code:
 
 (defgroup plaster nil
   "Pasting to a plaster host with Emacs buffers."
@@ -40,11 +65,11 @@
                                    ("rustsrc" . rust-mode)
                                    ("xml" . nxml-mode)
                                    ("xml-dtd" . nxml-mode))
-  "A map of plaster paste types to emacs modes."
+  "A map of plaster paste types to Emacs modes."
   :type '(alist :key-type string :value-type symbol))
 
 (defvar plaster-mode-map (make-sparse-keymap)
-  "Keymap for plaster-mode.")
+  "Keymap for function ‘plaster-mode’.")
 
 (defvar-local plaster-id nil
   "The paste ID associated with this buffer.")
@@ -56,6 +81,9 @@
 (require 'json)
 
 (defun plaster-find-session-token (cookies)
+  "Find the radiance-session token in the cookie jar.
+
+Argument COOKIES The cookie jar as used in ‘url-cookie-list’."
   (let* ((domain (url-host (url-generic-parse-url plaster-api)))
          (cookies (dolist (cookie cookies)
                     (when (or (cl-search (car cookie) domain)
@@ -66,27 +94,42 @@
         (return (aref cookie 2))))))
 
 (defun plaster-make-cookie (var val &optional time path domain)
+  "Create a new cookie value in the expected format for URL.
+
+Argument VAR The name of the cookie variable.
+Argument VAL The name of the cookie value.
+Optional argument TIME The cookie's expiry date string.
+Optional argument PATH The cookie's path.
+Optional argument DOMAIN The cookie's active domain."
   (let ((time (or time (format-time-string "%a, %d %b %Y %H:%M:%S %z" (+ (float-time) 3600))))
         (path (or path "/"))
         (domain (or domain (url-host (url-generic-parse-url plaster-api)))))
     `[url-cookie ,var ,val ,time ,path ,domain nil]))
 
 (defun plaster-api (endpoint)
+  "Construct the URL to the given plaster API ENDPOINT."
   (concat plaster-root "api/plaster/" endpoint))
 
 (defun plaster-paste-url (id)
+  "Construct the URL to view the paste with the given ID."
   (concat plaster-root "view/" id))
 
 (defun plaster-to-string (a)
+  "Turn A into a string."
   (with-output-to-string (princ a)))
 
 (defun plaster-type-mode (type)
+  "Return the name of a suitable mode for the given paste TYPE if any."
   (let ((explicit-mode (cdr (assoc type plaster-type-mode-map)))
         (implicit-mode (intern-soft (concat type "-mode"))))
     (or (and explicit-mode (fboundp explicit-mode) explicit-mode)
         (and implicit-mode (fboundp implicit-mode) implicit-mode))))
 
 (defun plaster-request (endpoint params)
+  "Perform a request against the Radiance API.
+
+Argument ENDPOINT The URL of the endpoint to request against.
+Argument PARAMS An alist of request parameters."
   (let ((url-request-method "POST")
         (url-cookie-storage
           (when plaster-session-token
@@ -115,8 +158,11 @@
   "Log in to the remote plaster server.
 
 On successful log in this will update the
-plaster-session-token to a token that should be
-associated with the given account."
+‘plaster-session-token’ to a token that should be
+associated with the given account.
+
+Optional argument USERNAME The username of the account.
+Optional argument PASSWORD The password to the account."
   (interactive)
   (let* ((username (or username (read-string "Username: ")))
          (password (or password (read-string "Password: "))))
@@ -133,9 +179,9 @@ associated with the given account."
   "Visit an existing paste in a new buffer.
 
 If no ID is given, it will query you for one in the
-minibuffer. If the remote paste exists and is accessible
+minibuffer.  If the remote paste exists and is accessible
 to you, the paste's contents will be opened in a new
-buffer in plaster-mode."
+buffer in function ‘plaster-mode’."
   (interactive)
   (let ((id (or id (read-string "Paste ID: "))))
     (when (equal id "") (return))
@@ -153,13 +199,16 @@ buffer in plaster-mode."
         (switch-to-buffer (current-buffer))
         (message "Now viewing paste from %s" (plaster-paste-url id))))))
 
-(defun plaster-update (id &optional (text (buffer-string)))
-  "Updates the specified text with the given text.
+(defun plaster-update (id &optional text)
+  "Update the specified ID with the given TEXT.
 
-By default the current buffer string is used."
-  (plaster-request (plaster-api "edit")
-                   `(("id" . ,id)
-                     ("text" . ,text)))
+By default the current buffer string is used.
+
+Argument ID The ID of the paste to update."
+  (let ((text (or text (buffer-string))))
+    (plaster-request (plaster-api "edit")
+                     `(("id" . ,id)
+                       ("text" . ,text))))
   (message "Paste updated."))
 
 (defun plaster-paste-buffer (&optional type title)
@@ -167,7 +216,10 @@ By default the current buffer string is used."
 
 This creates a fresh paste on the remote Plaster server.
 On successful save, the new paste's URL is displayed in
-the minibuffer and copied to the kill-ring for you."
+the minibuffer and copied to the ‘kill-ring’ for you.
+
+Optional argument TYPE The paste type to use.
+Optional argument TITLE The title for the paste."
   (interactive)
   (let* ((type (or type
                    (car (rassoc major-mode plaster-type-mode-map))
@@ -189,7 +241,9 @@ the minibuffer and copied to the kill-ring for you."
   "Save the current paste.
 
 If the current buffer does not represent a paste, a new
-paste is created for it."
+paste is created for it.
+
+Optional argument ID The ID for the paste to save to.  If nil, a new paste is created."
   (interactive)
   (let ((id (or id plaster-id)))
     (if id
@@ -200,7 +254,7 @@ paste is created for it."
   "Save the current paste.
 
 If the current buffer represents a file, then the usual
-save-buffer is performed as well. If the current buffer
+‘save-buffer’ is performed as well.  If the current buffer
 does not represent a paste, a new paste is created for it."
   (interactive)
   (when buffer-file-name
@@ -224,7 +278,8 @@ is opened."
   "Create an annotation to a paste.
 
 If the current buffer represents a paste, then the annotation
-will be made against that paste."
+will be made against that paste.
+Optional argument PARENT The ID of the parent paste to annotate."
   (interactive)
   (let ((id (or parent plaster-parent plaster-id (read-string "Parent paste: "))))
     (with-current-buffer (generate-new-buffer (concat "Annotation to " (plaster-to-string id)))
@@ -236,7 +291,9 @@ will be made against that paste."
   "Delete a plaster paste.
 
 If the current buffer represents a paste, then it will delete
-this paste and close the buffer."
+this paste and close the buffer.
+
+Optional argument ID The ID of the paste to delete."
   (interactive)
   (let ((id (or id plaster-id (read-string "Paste ID: "))))
     (plaster-request (plaster-api "delete")
@@ -257,6 +314,7 @@ through simple keystrokes."
 (define-key plaster-mode-map (kbd "C-x C-s") #'plaster-save)
 (define-key plaster-mode-map (kbd "C-x C-k") #'plaster-delete)
 (define-key plaster-mode-map (kbd "C-x C-a") #'plaster-annotate)
-;; (define-key plaster-mode-map (kbd ""))
 
 (provide 'plaster)
+
+;;; plaster.el ends here
