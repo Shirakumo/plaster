@@ -30,7 +30,7 @@
 ;;     Create an annotation for the current paste
 ;; - plaster-save                        (C-x C-s)
 ;;     Save the current buffer as a paste
-;; - plaster-delete                      (C-x C-d)
+;; - plaster-delete                      (C-x C-k)
 ;;     Delete the current buffer's paste
 ;;
 ;; The keybindings mentioned are only active in

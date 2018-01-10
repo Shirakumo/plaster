@@ -27,7 +27,7 @@ Using the [plaster.el](https://github.com/Shirakumo/plaster/blob/rewrite/plaster
 * `plaster-save`  
   Save the current buffer as a paste (C-x C-s)
 * `plaster-delete`  
-  Delete the current buffer's paste (C-x C-d)
+  Delete the current buffer's paste (C-x C-k)
 
 The keybindings are for when you're in a buffer with `plaster-mode` active.
 
