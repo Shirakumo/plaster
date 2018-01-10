@@ -189,7 +189,7 @@
   (let ((table (make-hash-table :test 'eql)))
     (flet ((copy (field)
              (setf (gethash field table) (dm:field paste field))))
-      (mapcar #'copy '("title" "time" "author" "visibility" "text" "type")))
+      (mapcar #'copy '("_id" "title" "time" "author" "visibility" "text" "type")))
     (when include-annotations
       (setf (gethash "annotations" table)
             (mapcar #'reformat-paste (paste-annotations paste))))
