@@ -114,7 +114,7 @@
   "Find the radiance-session token in the cookie jar.
 
 Argument COOKIES The cookie jar as used in ‘url-cookie-list’."
-  (let* ((domain (url-host (url-generic-parse-url plaster-api)))
+  (let* ((domain (url-host (url-generic-parse-url plaster-root)))
          (cookies (dolist (cookie cookies)
                     (when (or (cl-search (car cookie) domain)
                               (cl-search domain (car cookie)))
@@ -133,7 +133,7 @@ Optional argument PATH The cookie's path.
 Optional argument DOMAIN The cookie's active domain."
   (let ((time (or time (format-time-string "%a, %d %b %Y %H:%M:%S %z" (+ (float-time) 3600))))
         (path (or path "/"))
-        (domain (or domain (url-host (url-generic-parse-url plaster-api)))))
+        (domain (or domain (url-host (url-generic-parse-url plaster-root)))))
     `[url-cookie ,var ,val ,time ,path ,domain nil]))
 
 (defun plaster-api (endpoint)
@@ -166,7 +166,7 @@ Argument PARAMS An alist of request parameters."
   (let ((url-request-method "POST")
         (url-cookie-storage
           (when plaster-session-token
-            `((,(url-host (url-generic-parse-url plaster-api))
+            `((,(url-host (url-generic-parse-url plaster-root))
                ,(plaster-make-cookie "radiance-session" plaster-session-token)))))
         (url-request-extra-headers
           '(("Content-Type" . "application/x-www-form-urlencoded")))
