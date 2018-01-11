@@ -144,13 +144,9 @@ Optional argument DOMAIN The cookie's active domain."
   "Construct the URL to view the paste with the given ID."
   (concat plaster-root "view/" id))
 
-(defun plaster-to-string (a)
-  "Turn A into a string."
-  (with-output-to-string (princ a)))
-
 (defun plaster-type-mode (type)
   "Return the name of a suitable mode for the given paste TYPE if any."
-  (let ((explicit-mode (cdr (assoc type plaster-type-mode-map)))
+  (let ((explicit-mode (alist-get type plaster-type-mode-map))
         (implicit-mode (intern-soft (concat type "-mode"))))
     (or (and explicit-mode (fboundp explicit-mode) explicit-mode)
         (and implicit-mode (fboundp implicit-mode) implicit-mode))))
@@ -178,7 +174,7 @@ Argument PARAMS An alist of request parameters."
           (mapconcat (lambda (arg)
                        (concat (url-hexify-string (car arg))
                                "="
-                               (url-hexify-string (plaster-to-string (cdr arg)))))
+                               (url-hexify-string (format "%s" (cdr arg)))))
                      params
                      "&")))
     (let ((response (with-current-buffer (url-retrieve-synchronously endpoint)
@@ -186,10 +182,10 @@ Argument PARAMS An alist of request parameters."
                       (re-search-forward "^$")
                       (delete-region (point) (point-min))
                       (json-read-from-string (buffer-string)))))
-      (unless (= 200 (cdr (assoc 'status response)))
-        (error "Plaster request failed: %s" (cdr (assoc 'message response))))
+      (unless (= 200 (alist-get 'status response))
+        (error "Plaster request failed: %s" (alist-get 'message response)))
       (setq plaster-session-token (plaster-find-session-token url-cookie-storage))
-      (cdr (assoc 'data response)))))
+      (alist-get 'data response))))
 
 (defun plaster-login (&optional username password)
   "Log in to the remote plaster server.
@@ -224,10 +220,10 @@ buffer in function ‘plaster-mode’."
     (when (equal id "") (return))
     (let* ((data (plaster-request (plaster-api "view")
                                   `(("id" . ,id))))
-           (mode (plaster-type-mode (cdr (assoc 'type data)))))
-      (with-current-buffer (generate-new-buffer (cdr (assoc 'title data)))
-        (setq plaster-id (plaster-to-string (cdr (assoc '_id data))))
-        (insert (cdr (assoc 'text data)))
+           (mode (plaster-type-mode (alist-get 'type data))))
+      (with-current-buffer (generate-new-buffer (alist-get 'title data))
+        (setq plaster-id (format "%s" (alist-get '_id data)))
+        (insert (alist-get 'text data))
         (goto-char (point-min))
         (replace-string "\n" "\n")
         (when mode
@@ -269,7 +265,7 @@ Optional argument TITLE The title for the paste."
                                   ("type" . ,type)
                                   ("parent" . ,(or plaster-parent ""))))))
     (unless plaster-mode (plaster-mode))
-    (setq plaster-id (plaster-to-string (cdr (assoc '_id data))))
+    (setq plaster-id (format "%s" (alist-get '_id data)))
     (let ((url (plaster-paste-url plaster-id)))
       (kill-new url)
       (message "Paste now available at: %s" url))))
@@ -342,7 +338,7 @@ will be made against that paste.
 Optional argument PARENT The ID of the parent paste to annotate."
   (interactive)
   (let ((id (or parent plaster-parent plaster-id (read-string "Parent paste: "))))
-    (with-current-buffer (generate-new-buffer (concat "Annotation to " (plaster-to-string id)))
+    (with-current-buffer (generate-new-buffer (concat "Annotation to " (format "%s" id)))
       (setq plaster-parent id)
       (plaster-mode)
       (switch-to-buffer (current-buffer)))))
@@ -358,9 +354,9 @@ Optional argument ID The ID of the paste to delete."
   (let ((id (or id plaster-id (read-string "Paste ID: "))))
     (plaster-request (plaster-api "delete")
                      `(("id" . ,id)))
-    (when (equal plaster-id (plaster-to-string id))
+    (when (equal plaster-id (format "%s" id))
       (kill-buffer))
-    (message "Paste %s has been deleted." (plaster-to-string id))))
+    (message "Paste %s has been deleted." (format "%s" id))))
 
 (define-minor-mode plaster-mode
   "Toggle Plaster mode.
