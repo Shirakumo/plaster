@@ -187,6 +187,7 @@ Argument PARAMS An alist of request parameters."
       (setq plaster-session-token (plaster-find-session-token url-cookie-storage))
       (alist-get 'data response))))
 
+;;;###autoload
 (defun plaster-login (&optional username password)
   "Log in to the remote plaster server.
 
@@ -208,6 +209,7 @@ Optional argument PASSWORD The password to the account."
      (error
       (message "%s" (error-message-string error))))))
 
+;;;###autoload
 (defun plaster-visit (&optional id)
   "Visit an existing paste in a new buffer.
 
@@ -244,6 +246,7 @@ Argument ID The ID of the paste to update."
                        ("text" . ,text))))
   (message "Paste updated."))
 
+;;;###autoload
 (defun plaster-paste-buffer (&optional type title)
   "Paste the current buffer to a new remote paste.
 
@@ -270,6 +273,7 @@ Optional argument TITLE The title for the paste."
       (kill-new url)
       (message "Paste now available at: %s" url))))
 
+;;;###autoload
 (defun plaster-paste-region (&optional type title)
   "Paste the currently active region to a new remote paste.
 
@@ -317,6 +321,7 @@ does not represent a paste, a new paste is created for it."
     (save-buffer))
   (plaster-save-paste))
 
+;;;###autoload
 (defun plaster-new ()
   "Visit a new buffer that represents a paste.
 
@@ -358,6 +363,7 @@ Optional argument ID The ID of the paste to delete."
       (kill-buffer))
     (message "Paste %s has been deleted." (format "%s" id))))
 
+;;;###autoload
 (define-minor-mode plaster-mode
   "Toggle Plaster mode.
 
