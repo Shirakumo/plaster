@@ -41,3 +41,6 @@ You can also use the customize-group `plaster` to edit some settings:
   The token for the Radiance session that authenticates you.
 * `plaster-type-mode-map`  
   A map that decides which Emacs mode to use for which paste types.
+
+## Demo Setup
+An existing Plaster installation is publicly available at [plaster.tymoon.eu](https://plaster.tymoon.eu).
