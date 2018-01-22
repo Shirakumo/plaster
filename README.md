@@ -10,8 +10,8 @@ This is a paste service application for the [Radiance](https://shirakumo.github.
 * Paste annotations and editing
 * Complete REST API
 
-## Emacs integration
-Using the [plaster.el](https://github.com/Shirakumo/plaster/blob/rewrite/plaster.el) ([soon](https://github.com/melpa/melpa/pull/5234) on MELPA), you can manage pastes on Plaster directly within Emacs:
+## Emacs integration [![MELPA](https://melpa.org/packages/plaster-badge.svg)](https://melpa.org/#/plaster)
+Using the [plaster.el](https://github.com/Shirakumo/plaster/blob/rewrite/plaster.el), you can manage pastes on Plaster directly within Emacs:
 
 * `plaster-login`  
   If you have a plaster account, use this
