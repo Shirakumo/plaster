@@ -121,9 +121,9 @@
 (require 'url)
 (require 'json)
 
-(defun plaster-read-type (&optional (default "text"))
+(defun plaster-read-type (&optional default)
   (let ((completion-ignore-case t))
-    (completing-read "Paste type:" plaster-types nil t nil nil default)))
+    (completing-read "Paste type:" plaster-types nil t nil nil (or default "text"))))
 
 (defun plaster-find-session-token (cookies)
   "Find the radiance-session token in the cookie jar.
