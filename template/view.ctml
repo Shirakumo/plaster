@@ -62,6 +62,7 @@
                   <input type="text" name="title" placeholder="Untitled" maxlength="32" readonly
                          lquery="(val title)" />
                   <span class="type" lquery="(text type)"></span>
+                  <span style="display:none" class="theme" lquery="(text (** :theme))"/>
                   <a rel="author" lquery="(text author)" @href="plaster/user/{0} author">AUTHOR</a>
                   <a rel="bookmark" @href="plaster/view/{0} _id"><time lquery="(time time)">2106.10.23</time></a>
                 </header>
