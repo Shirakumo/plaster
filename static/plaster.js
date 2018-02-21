@@ -91,7 +91,7 @@ var Plaster = function(){
         }
 
         self.editors.push(element);
-        if(!config) config = {};
+        if(config) config = Object.assign({}, config); else config = {};
         if(!config.readOnly) config.readOnly = text.hasAttribute("readonly");
 
         if(config.theme){
