@@ -54,6 +54,12 @@
   (apply #'user:add-default-permissions (config :permissions :default))
   (apply #'user:grant "anonymous" (config :permissions :anonymous)))
 
+(define-version-migration plaster (NIL 1.0.0)
+  (let ((anonymous (user:get "anonymous")))
+    (dolist (user (user:list))
+      (unless (eql user anonymous)
+        (apply #'user:grant user (config :permissions :default))))))
+
 (defun ensure-paste (paste-ish)
   (etypecase paste-ish
     (dm:data-model paste-ish)
