@@ -8,6 +8,12 @@
 (asdf:defsystem #:plaster
   :defsystem-depends-on (:radiance)
   :class "radiance:virtual-module"
+  :author "Nicolas Hafner <shinmera@tymoon.eu>"
+  :maintainer "Nicolas Hafner <shinmera@tymoon.eu>"
+  :license "Artistic"
+  :version "1.0.0"
+  :description "A paste bin service for Radiance"
+  :homepage "https://github.com/Shirakumo/plaster"
   :components ((:file "module")
                (:file "objects")
                (:file "frontend")
