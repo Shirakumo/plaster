@@ -13,7 +13,9 @@
   :license "Artistic"
   :version "1.0.0"
   :description "A paste bin service for Radiance"
-  :homepage "https://github.com/Shirakumo/plaster"
+  :homepage "https://Shirakumo.github.io/plaster/"
+  :bug-tracker "https://github.com/Shirakumo/plaster/issues"
+  :source-control (:git "https://github.com/Shirakumo/plaster.git")
   :components ((:file "module")
                (:file "objects")
                (:file "frontend")
