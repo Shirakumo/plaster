@@ -13,9 +13,10 @@
       <option lquery="(text *) (attr :value * :selected (equal * (** :type)))">TYPE</option>
     </select><br />
     Preview:
-    <textarea id="preview"></textarea>
+    <textarea id="preview" class="text"></textarea>
     <div class="actionbar"><input type="submit" name="action" value="Save" /></div>
   </form>
 </div>
 <script type="text/javascript" @src="/static/plaster/codemirror/codemirror.js" />
 <script type="text/javascript" @src="/static/plaster/plaster.js" />
+<script type="text/javascript" @src="/static/plaster/type-map.js" />

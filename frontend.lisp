@@ -111,7 +111,7 @@
   (admin:define-panel settings plaster (:clip "admin-panel.ctml")
     (with-actions (error info)
         ((:save
-          (setf (user:field "plaster-type" (auth:current)) (post/get "text"))
+          (setf (user:field "plaster-type" (auth:current)) (post/get "type"))
           (setf (user:field "plaster-theme" (auth:current)) (post/get "theme"))
           (setf info "Editor preferences saved.")))
       (r-clip:process T :types *paste-types*
