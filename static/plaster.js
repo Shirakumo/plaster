@@ -15,12 +15,12 @@ var Plaster = function(){
         args.unshift("[Plaster]");
         console.log.apply(console, args);
         return null;
-    }
+    };
 
     self.addToHead = function(element){
         document.getElementsByTagName("head")[0].appendChild(element);
         return element;
-    }
+    };
 
     self.loadScript = function(url, callback){
         self.log("Loading script",url);
@@ -29,7 +29,7 @@ var Plaster = function(){
         script.src = url;
         script.onload = callback;
         return self.addToHead(script);
-    }
+    };
 
     self.loadStylesheet = function(url, callback){
         self.log("Loading stylesheet",url);
@@ -39,7 +39,7 @@ var Plaster = function(){
         link.href = url;
         link.onload = callback;
         return self.addToHead(link);
-    }
+    };
 
     self.maybeLoadTheme = function(theme, callback){
         if(self.loadedThemes.indexOf(theme) === -1){
@@ -49,7 +49,7 @@ var Plaster = function(){
             if(callback) callback();
         }
         return true;
-    }
+    };
 
     self.maybeLoadMode = function(mode, callback){
         if(self.loadedModes.indexOf(mode) === -1){
@@ -59,19 +59,19 @@ var Plaster = function(){
             if(callback) callback();
         }
         return true;
-    }
+    };
 
     self.modeMIME = function(mode){
         var info = self.typeMap[mode];
         if(info) return info.mime;
         else     return mode;
-    }
+    };
 
     self.modePath = function(mode){
         var info = self.typeMap[mode];
         if(info) return info.path;
         else     return "mode/"+mode+".js";
-    }
+    };
 
     self.createEditor = function(element, config, callback){
         var text = element.getElementsByClassName("text")[0];
@@ -132,7 +132,7 @@ var Plaster = function(){
             });
         });
         return element;
-    }
+    };
 
     self.maybeCreateEditor = function(element, config, callback){
         if(self.editors.indexOf(element) === -1){
@@ -141,7 +141,7 @@ var Plaster = function(){
             if(callback) callback();
         }
         return element;
-    }
+    };
 
     self.changeMode = function(element, mode){
         if(!element.mirror) throw element+" is not an initialized CodeMirror editor.";
@@ -149,7 +149,7 @@ var Plaster = function(){
             element.mirror.setOption("mode", self.modeMIME(mode));
         });
         return element;
-    }
+    };
 
     self.changeTheme = function(element, theme){
         if(!element.mirror) throw element+" is not an initialized CodeMirror editor.";
@@ -157,19 +157,19 @@ var Plaster = function(){
             element.mirror.setOption("theme", theme);
         });
         return element;
-    }
+    };
 
     self.initEditors = function(){
         var els = document.getElementsByClassName("edit");
 
         var createNext = function(i){
             if(i<els.length)
-                self.maybeCreateEditor(els[i], self.defaultConfig, function(){createNext(i+1)});
-        }
+                self.maybeCreateEditor(els[i], self.defaultConfig, function(){createNext(i+1);});
+        };
         
         createNext(0);
         return els;
-    }
+    };
 
     self.init = function(){
         self.initEditors();
@@ -179,8 +179,8 @@ var Plaster = function(){
         location.hash = "";
         location.hash = hash;
         return true;
-    }
-}
+    };
+};
 
 var plaster = new Plaster();
-window.onload = plaster.init
+document.addEventListener("DOMContentLoaded", plaster.init);
