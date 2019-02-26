@@ -43,7 +43,7 @@
   (error 'api-error :message (format NIL "Please wait ~a second~:p before pasting again."
                                      time-left)))
 
-(define-api plaster/new (text &optional title type parent visibility password current-password) ()
+(define-api plaster/new (text &optional title type parent visibility password current-password captcha captcha-solution) ()
   (rate:with-limitation (create)
     (check-permission 'new)
     (when parent (check-password parent current-password))
@@ -51,13 +51,17 @@
               (or* (post/get "subject"))
               (or* (post/get "email")))
       (error 'request-denied :message "You seem like a spammer."))
-    (let ((paste (create-paste text :title title
-                                    :type type
-                                    :parent parent
-                                    :visibility visibility
-                                    :password password
-                                    :author (user:username (or (auth:current) (user:get "anonymous"))))))
-      (api-paste-output paste))))
+    (let ((current (auth:current "anonymous")))
+      (when (and (user:= current (user:get "anonymous"))
+                 (not (captcha-correct-p captcha captcha-solution)))
+        (error 'api-argument-invalid :argument "captcha" :message "You did not enter the captcha correctly."))
+      (let ((paste (create-paste text :title title
+                                      :type type
+                                      :parent parent
+                                      :visibility visibility
+                                      :password password
+                                      :author (user:username current))))
+        (api-paste-output paste)))))
 
 (define-api plaster/edit (id &optional text type title visibility password current-password) ()
   (let ((paste (ensure-paste id)))

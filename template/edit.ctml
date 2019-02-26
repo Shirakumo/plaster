@@ -69,6 +69,13 @@
             <input type="hidden" name="browser" value="true" />
             <input type="hidden" name="parent" lquery="(val (** :parent))" />
             <input type="hidden" name="current-password" lquery="(val (** :password))" />
+            <c:when test="(and (dm:hull-p *) (null (auth:current)))">
+              <span>Unscramble the following word:</span>
+              <input type="hidden" name="captcha-solution"
+                     lquery="(val (plaster::encrypt-captcha-solution (** :captcha-solution)))" />
+              <input type="text" placeholder="Captcha..." required autofill="off" name="captcha"
+                     lquery="(attr :placeholder (** :captcha))" />
+            </c:when>
             <c:if test="(or (** :repaste) (dm:hull-p *))">
               <c:then>
                 <input type="submit" @formaction="/api/plaster/new" value="Post" />

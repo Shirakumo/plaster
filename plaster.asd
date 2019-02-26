@@ -18,6 +18,7 @@
   :source-control (:git "https://github.com/Shirakumo/plaster.git")
   :components ((:file "module")
                (:file "objects")
+               (:file "captcha")
                (:file "frontend")
                (:file "api"))
   :depends-on ((:interface :database)
@@ -27,4 +28,5 @@
                (:interface :rate)
                :r-data-model
                :r-clip
+               :alexandria
                :crypto-shortcuts))

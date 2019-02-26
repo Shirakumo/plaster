@@ -33,15 +33,18 @@
       (setf (dm:field paste "type") (or* (user:field "plaster-type" (auth:current "anonymous"))
                                          "text")))
     (with-password-protection ((or parent paste))
-      (r-clip:process T :paste paste
-                        :password (post/get "password")
-                        :parent (when parent (dm:id parent))
-                        :types *paste-types*
-                        :repaste (get-var "repaste")
-                        :error (get-var "error")
-                        :message (get-var "message")
-                        :theme (or* (user:field "plaster-theme" (auth:current "anonymous"))
-                                    "default")))))
+      (multiple-value-bind (captcha captcha-solution) (generate-captcha)
+        (r-clip:process T :paste paste
+                          :password (post/get "password")
+                          :parent (when parent (dm:id parent))
+                          :types *paste-types*
+                          :repaste (get-var "repaste")
+                          :error (get-var "error")
+                          :message (get-var "message")
+                          :theme (or* (user:field "plaster-theme" (auth:current "anonymous"))
+                                      "default")
+                          :captcha captcha
+                          :captcha-solution captcha-solution)))))
 
 (define-page view "plaster/view/(.*)" (:uri-groups (id) :clip "view.ctml")
   (let* ((paste (ensure-paste id))

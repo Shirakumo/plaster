@@ -96,6 +96,14 @@
      (.actions
       :display flex
       :justify-content flex-end
+      :background #(header-bg)
+      :color #(header-fg)
+      (input[name=captcha]
+       :background (rgb 50 50 50)
+       :color (rgb 255 255 255)
+       :border none
+       :padding 2px
+       :margin 0 2px)
       ("input[placeholder='Empty']"
        :display none)
       ((:or a input)
