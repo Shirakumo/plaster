@@ -10,7 +10,7 @@
   :class "radiance:virtual-module"
   :author "Nicolas Hafner <shinmera@tymoon.eu>"
   :maintainer "Nicolas Hafner <shinmera@tymoon.eu>"
-  :license "Artistic"
+  :license "zlib"
   :version "1.0.0"
   :description "A paste bin service for Radiance"
   :homepage "https://Shirakumo.github.io/plaster/"
