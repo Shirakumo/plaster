@@ -29,6 +29,7 @@
     (if id
         (check-permission '(edit delete) paste)
         (check-permission 'new))
+    (setf (header "X-Robots-Tag") "nofollow")
     (unless id
       (setf (dm:field paste "type") (or* (user:field "plaster-type" (auth:current "anonymous"))
                                          "text")))
@@ -50,6 +51,7 @@
   (let* ((paste (ensure-paste id))
          (parent (paste-parent paste)))
     (check-permission 'view paste)
+    (setf (header "X-Robots-Tag") "nofollow")
     (if parent
         (redirect (paste-url paste parent))
         (with-password-protection (paste)
@@ -63,12 +65,14 @@
 (define-page raw "plaster/view/([^/]*)/raw" (:uri-groups (id))
   (let ((paste (ensure-paste id)))
     (check-permission 'view paste)
+    (setf (header "X-Robots-Tag") "nofollow")
     (with-password-protection (paste)
       (setf (content-type *response*) "text/plain")
       (dm:field paste "text"))))
 
 (define-page list "plaster/list(?:/(.*))?" (:uri-groups (page) :clip "list.ctml")
   (check-permission 'list)
+  (setf (header "X-Robots-Tag") "nofollow")
   (let* ((page (or (when page (parse-integer page :junk-allowed T)) 0))
          (pastes (dm:get 'pastes (db:query (:= 'visibility 1))
                          :sort '((time :DESC))
@@ -80,6 +84,7 @@
 
 (define-page user "plaster/user/([^/]*)(?:/(.*))?" (:uri-groups (username page) :clip "user.ctml")
   (check-permission 'user)
+  (setf (header "X-Robots-Tag") "nofollow")
   (let* ((page (or (when page (parse-integer page :junk-allowed T)) 0))
          (user (user:get username)))
     (unless user
@@ -125,3 +130,7 @@
 
 (define-page frontpage "plaster/^$" ()
   (redirect #@"plaster/edit"))
+
+(define-page no-robots "plaster/robots.txt" ()
+  "User-agent: *
+Disallow: /")
