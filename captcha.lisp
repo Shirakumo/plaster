@@ -7,7 +7,7 @@
 (in-package #:org.shirakumo.radiance.plaster)
 
 (defparameter *spam-tests*
-  (with-open-file (s (make-pathname :name "spam" :type "txt" :defaults (or *compile-file-pathname* *load-pathname*)))
+  (with-open-file (s (make-pathname :name "spam" :type "txt" :defaults (asdf:system-relative-pathname :plaster "spam.txt")))
     (loop for line = (read-line s NIL)
           while line
           collect (cl-ppcre:create-scanner line :case-insensitive-mode T))))
