@@ -29,4 +29,5 @@
                :r-data-model
                :r-clip
                :alexandria
-               :crypto-shortcuts))
+               :crypto-shortcuts
+               :cl-ppcre))
