@@ -1,15 +1,8 @@
-#|
- This file is a part of Purplish
- (c) 2016 Shirakumo http://tymoon.eu (shinmera@tymoon.eu)
- Author: Nicolas Hafner <shinmera@tymoon.eu>
-|#
-
-
 (asdf:defsystem #:plaster
   :defsystem-depends-on (:radiance)
   :class "radiance:virtual-module"
-  :author "Nicolas Hafner <shinmera@tymoon.eu>"
-  :maintainer "Nicolas Hafner <shinmera@tymoon.eu>"
+  :author "Yukari Hafner <shinmera@tymoon.eu>"
+  :maintainer "Yukari Hafner <shinmera@tymoon.eu>"
   :license "zlib"
   :version "1.0.0"
   :description "A paste bin service for Radiance"
