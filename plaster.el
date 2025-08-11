@@ -1,9 +1,9 @@
 ;;; plaster.el --- Pasting to a plaster host with buffers. -*- lexical-binding: t; -*-
 
-;; Copyright (c) 2017 Nicolas Hafner
+;; Copyright (c) 2017 Yukari Hafner
 ;;
-;; Author: Nicolas Hafner <shinmera@tymoon.eu>
-;; URL: http://github.com/shirakumo/plaster/
+;; Author: Yukari Hafner <shinmera@tymoon.eu>
+;; URL: https://shirakumo.org/docs/plaster/
 ;; Package-Requires: ((emacs "24.3"))
 ;; Version: 1.0
 ;; Keywords: convenience, paste service
@@ -24,7 +24,7 @@
 ;; However, you can also configure your own setup
 ;; if you so desire. The Plaster server app can
 ;; be obtained at
-;;   https://github.com/Shirakumo/plaster
+;;   https://shirakumo.org/project/plaster
 ;;
 ;; The following commands are available:
 ;;

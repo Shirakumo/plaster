@@ -85,7 +85,7 @@
       </c:when>
     </main>
     <footer>
-      Running on <a href="https://github.com/Shirakumo/plaster">Plaster</a>
+      Running on <a href="https://shirakumo.org/project/plaster">Plaster</a>
     </footer>
     <script type="text/javascript" @src="/static/plaster/codemirror/codemirror.js" />
     <script type="text/javascript" @src="/static/plaster/codemirror/addon/edit/matchbrackets.js" />

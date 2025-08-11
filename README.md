@@ -1,5 +1,5 @@
 ## About Plaster
-This is a paste service application for the [Radiance](https://shirakumo.github.io/radiance) environment. It provides an editor and syntax highlighting for a variety of languages by using [CodeMirror](http://codemirror.net/). The main features of this application are also subject of the [Radiance tutorial](https://github.com/Shirakumo/radiance-tutorial/blob/master/Part%200.md) where you'll learn how to build Plaster step by step.
+This is a paste service application for the [Radiance](https://shirakumo.org/docs/radiance) environment. It provides an editor and syntax highlighting for a variety of languages by using [CodeMirror](http://codemirror.net/). The main features of this application are also subject of the [Radiance tutorial](https://shirakumo.org/project/radiance-tutorial/blob/master/Part%200.md) where you'll learn how to build Plaster step by step.
 
 ## Features
 
@@ -11,7 +11,7 @@ This is a paste service application for the [Radiance](https://shirakumo.github.
 * Complete REST API
 
 ## Emacs integration [![MELPA](https://melpa.org/packages/plaster-badge.svg)](https://melpa.org/#/plaster)
-Using the [plaster.el](https://github.com/Shirakumo/plaster/blob/rewrite/plaster.el), you can manage pastes on Plaster directly within Emacs:
+Using the [plaster.el](https://shirakumo.org/project/plaster/blob/rewrite/plaster.el), you can manage pastes on Plaster directly within Emacs:
 
 * `plaster-login`  
   If you have a plaster account, use this

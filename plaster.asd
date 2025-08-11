@@ -6,9 +6,9 @@
   :license "zlib"
   :version "1.0.0"
   :description "A paste bin service for Radiance"
-  :homepage "https://Shirakumo.github.io/plaster/"
-  :bug-tracker "https://github.com/Shirakumo/plaster/issues"
-  :source-control (:git "https://github.com/Shirakumo/plaster.git")
+  :homepage "https://shirakumo.org/docs/plaster/"
+  :bug-tracker "https://shirakumo.org/project/plaster/issues"
+  :source-control (:git "https://shirakumo.org/project/plaster.git")
   :components ((:file "module")
                (:file "objects")
                (:file "captcha")
